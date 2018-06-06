@@ -1,4 +1,5 @@
 #include "RubiksCube.h"
+#include <string>
 RubiksCube::RubiksCube(int size) {
 	this->size = size;
 	this->data = new unsigned char[size * size * 6];
@@ -46,12 +47,27 @@ void RubiksCube::Undo() {
 
 std::ostream& operator<<(std::ostream& outputStream, const RubiksCube& cube) {
 	static const char color[] = {'G', 'R', 'W', 'Y', 'O', 'B'};
-	// TODO
-	for (int i = 0; i < cube.size * cube.size * 6; i++) {
-		outputStream << color[cube.data[i]];
-		if ((i + 1) % (cube.size * cube.size) == 0) {
-			outputStream << std::endl;
+	std::string padding(cube.size * 2, ' ');
+	for (int i = 0; i < cube.size; i++) {
+		outputStream << padding;
+		for (int j = 0; j < cube.size; j++) {
+			outputStream << color[cube.data[cube.size * cube.size * 2 + cube.size * i + j]] << ' ';
 		}
+		outputStream << std::endl;
+	}
+	for (int i = 0; i < cube.size; i++) {
+		for (int j = 0; j < cube.size; j++) outputStream << color[cube.data[cube.size * cube.size * 4 + cube.size * i + j]] << ' ';
+		for (int j = 0; j < cube.size; j++) outputStream << color[cube.data[cube.size * cube.size * 0 + cube.size * i + j]] << ' ';
+		for (int j = 0; j < cube.size; j++) outputStream << color[cube.data[cube.size * cube.size * 1 + cube.size * i + j]] << ' ';
+		for (int j = 0; j < cube.size; j++) outputStream << color[cube.data[cube.size * cube.size * 5 + cube.size * i + j]] << ' ';
+		outputStream << std::endl;
+	}
+	for (int i = 0; i < cube.size; i++) {
+		outputStream << padding;
+		for (int j = 0; j < cube.size; j++) {
+			outputStream << color[cube.data[cube.size * cube.size * 3 + cube.size * i + j]] << ' ';
+		}
+		outputStream << std::endl;
 	}
 	return outputStream;
 }
