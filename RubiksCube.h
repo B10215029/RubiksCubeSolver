@@ -4,8 +4,8 @@
 class RubiksCube {
 public:
 	//   U
-	// L F R D
-	//   B
+	// L F R B
+	//   D
 	enum OperateType { F, R, U, B, L, D, X, Y, Z };
 	int htm;
 	int qtm;
@@ -35,8 +35,8 @@ public:
 
 private:
 	//   2
-	// 4 0 1 5
-	//   3
+	// 4 0 1 3
+	//   5
 	unsigned char* data;
 	int lastFace;
 };

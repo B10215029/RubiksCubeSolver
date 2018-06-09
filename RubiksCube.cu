@@ -54,12 +54,12 @@ void RotateArray(unsigned char *dst, unsigned char *src, int size, int angle) {
 
 // 紀錄每個面周圍有哪幾個面(順時針，上右下左)
 static const int relatedFace[6][4] = {
-	{ 2, 1, 3, 4 },
-	{ 2, 5, 3, 0 },
-	{ 5, 1, 0, 4 },
-	{ 0, 1, 5, 4 },
-	{ 2, 0, 3, 5 },
-	{ 2, 4, 3, 1 },
+	{ 2, 1, 5, 4 },
+	{ 2, 3, 5, 0 },
+	{ 3, 1, 0, 4 },
+	{ 2, 4, 5, 1 },
+	{ 2, 0, 5, 3 },
+	{ 0, 1, 3, 4 },
 };
 
 // 紀錄每個面周圍的面與自己相連的方向
@@ -67,9 +67,9 @@ static const int relatedFaceDirection[6][4] = {
 	{ 2, 3, 0, 1 },
 	{ 1, 3, 1, 1 },
 	{ 0, 0, 0, 0 },
-	{ 2, 2, 2, 2 },
-	{ 3, 3, 3, 1 },
 	{ 0, 3, 2, 1 },
+	{ 3, 3, 3, 1 },
+	{ 2, 2, 2, 2 },
 };
 
 void RubiksCube::Rotate(int type, int column, int angle) {
@@ -117,7 +117,7 @@ void RubiksCube::Undo() {
 }
 
 std::ostream& operator<<(std::ostream& outputStream, const RubiksCube& cube) {
-	static const char color[] = { 'G', 'R', 'W', 'Y', 'O', 'B' };
+	static const char color[] = { 'G', 'R', 'W', 'B', 'O', 'Y' };
 	std::string padding(cube.size * 2, ' ');
 	for (int i = 0; i < cube.size; i++) {
 		outputStream << padding;
@@ -130,13 +130,13 @@ std::ostream& operator<<(std::ostream& outputStream, const RubiksCube& cube) {
 		for (int j = 0; j < cube.size; j++) outputStream << color[cube.data[cube.size * cube.size * 4 + cube.size * i + j]] << ' ';
 		for (int j = 0; j < cube.size; j++) outputStream << color[cube.data[cube.size * cube.size * 0 + cube.size * i + j]] << ' ';
 		for (int j = 0; j < cube.size; j++) outputStream << color[cube.data[cube.size * cube.size * 1 + cube.size * i + j]] << ' ';
-		for (int j = 0; j < cube.size; j++) outputStream << color[cube.data[cube.size * cube.size * 5 + cube.size * i + j]] << ' ';
+		for (int j = 0; j < cube.size; j++) outputStream << color[cube.data[cube.size * cube.size * 3 + cube.size * i + j]] << ' ';
 		outputStream << std::endl;
 	}
 	for (int i = 0; i < cube.size; i++) {
 		outputStream << padding;
 		for (int j = 0; j < cube.size; j++) {
-			outputStream << color[cube.data[cube.size * cube.size * 3 + cube.size * i + j]] << ' ';
+			outputStream << color[cube.data[cube.size * cube.size * 5 + cube.size * i + j]] << ' ';
 		}
 		outputStream << std::endl;
 	}
