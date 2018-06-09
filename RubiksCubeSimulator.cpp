@@ -76,6 +76,13 @@ void DrawTile(int type, double x, double y, double size) {
 	glVertex2f(x + size, y - sizeY);
 	glVertex2f(x + size, y);
 	glEnd();
+	glColor3f(0, 0, 0);
+	glBegin(GL_LINE_LOOP);
+	glVertex2f(x, y);
+	glVertex2f(x, y - sizeY);
+	glVertex2f(x + size, y - sizeY);
+	glVertex2f(x + size, y);
+	glEnd();
 }
 
 void RubiksCubeSolver::RubiksCubeSimulator::draw()
@@ -109,4 +116,6 @@ void RubiksCubeSolver::RubiksCubeSimulator::draw()
 	}
 
 	wglMakeCurrent(NULL, NULL);
+	this->labelHtm->Text = "HTM: " + cube->htm;
+	this->labelQtm->Text = "QTM: " + cube->qtm;
 }
