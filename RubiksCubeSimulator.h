@@ -388,7 +388,7 @@ namespace RubiksCubeSolver {
 			this->label4->Name = L"label4";
 			this->label4->Size = System::Drawing::Size(70, 44);
 			this->label4->TabIndex = 0;
-			this->label4->Text = L"F";
+			this->label4->Text = L"F(ºñ)";
 			this->label4->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
 			// 
 			// label5
@@ -399,7 +399,7 @@ namespace RubiksCubeSolver {
 			this->label5->Name = L"label5";
 			this->label5->Size = System::Drawing::Size(70, 44);
 			this->label5->TabIndex = 1;
-			this->label5->Text = L"R";
+			this->label5->Text = L"R(¬õ)";
 			this->label5->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
 			// 
 			// label6
@@ -410,7 +410,7 @@ namespace RubiksCubeSolver {
 			this->label6->Name = L"label6";
 			this->label6->Size = System::Drawing::Size(70, 44);
 			this->label6->TabIndex = 2;
-			this->label6->Text = L"U";
+			this->label6->Text = L"U(¥Õ)";
 			this->label6->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
 			// 
 			// label7
@@ -421,7 +421,7 @@ namespace RubiksCubeSolver {
 			this->label7->Name = L"label7";
 			this->label7->Size = System::Drawing::Size(70, 44);
 			this->label7->TabIndex = 3;
-			this->label7->Text = L"B";
+			this->label7->Text = L"B(ÂÅ)";
 			this->label7->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
 			// 
 			// label8
@@ -432,7 +432,7 @@ namespace RubiksCubeSolver {
 			this->label8->Name = L"label8";
 			this->label8->Size = System::Drawing::Size(70, 44);
 			this->label8->TabIndex = 4;
-			this->label8->Text = L"L";
+			this->label8->Text = L"L(¾ï)";
 			this->label8->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
 			// 
 			// label9
@@ -443,7 +443,7 @@ namespace RubiksCubeSolver {
 			this->label9->Name = L"label9";
 			this->label9->Size = System::Drawing::Size(74, 44);
 			this->label9->TabIndex = 5;
-			this->label9->Text = L"D";
+			this->label9->Text = L"D(¶À)";
 			this->label9->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
 			// 
 			// textBoxF
