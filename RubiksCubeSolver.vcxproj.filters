@@ -18,9 +18,15 @@
     <ClCompile Include="main.cpp">
       <Filter>來源檔案</Filter>
     </ClCompile>
+    <ClCompile Include="RubiksCubeSimulator.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RubiksCube.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="RubiksCubeSimulator.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

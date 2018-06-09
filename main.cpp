@@ -1,8 +1,11 @@
 #include "RubiksCube.h"
+#include "RubiksCubeSimulator.h"
 #include <iostream>
 #include <cstdlib>
 
 int main() {
+	RubiksCubeSolver::RubiksCubeSimulator form;
+	System::Windows::Forms::Application::Run(%form);
 	RubiksCube cube(3);
 	std::cout << cube;
 	int type;

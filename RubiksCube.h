@@ -10,6 +10,10 @@ public:
 	int htm;
 	int qtm;
 	int size;
+	//   2
+	// 4 0 1 3
+	//   5
+	unsigned char* data;
 	RubiksCube(int size);
 	~RubiksCube();
 	void Reset();
@@ -34,9 +38,5 @@ public:
 	friend std::ostream& operator<<(std::ostream& outputStream, const RubiksCube& cube);
 
 private:
-	//   2
-	// 4 0 1 3
-	//   5
-	unsigned char* data;
 	int lastFace;
 };
