@@ -36,7 +36,9 @@ public:
 	void Redo();
 	void Undo();
 	friend std::ostream& operator<<(std::ostream& outputStream, const RubiksCube& cube);
-
+	bool isSolved();
+	bool checkMe();
+	bool SolveTree(int turn, int maxTurn);
 private:
 	int lastFace;
 };

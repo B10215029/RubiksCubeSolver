@@ -25,11 +25,45 @@ void RubiksCube::Reset() {
 }
 
 void RubiksCube::Shuffle() {
-	// TODO
+	for (size_t i = 0; i < 200; i++)
+	{
+		int type = rand() % 6;
+		int column = (rand() % (size - 1)) + 1;
+		int angle = (rand() % 3) + 1;
+		Rotate(type, column, angle);
+	}
 }
 
 void RubiksCube::Solve() {
-	// TODO
+	if (SolveTree(1, 15)) {
+		std::cout << "success" << std::endl;
+	}
+	else {
+		std::cout << "fail" << std::endl;
+	}
+}
+
+bool RubiksCube::SolveTree(int turn, int maxTurn)
+{
+	if (turn > maxTurn)
+		return false;
+	for (size_t type = 0; type < 6; type++)
+	{
+		for (size_t column = 1; column < size; column++)
+		{
+			for (size_t angle = 1; angle < 4; angle++)
+			{
+				Rotate(type, column, angle);
+				if (isSolved())
+					return true;
+				else if (SolveTree(turn + 1, maxTurn))
+					return true;
+				else
+					Rotate(type, column, 4 - angle);
+			}
+		}
+	}
+	return false;
 }
 
 void RubiksCube::Rotate(OperateType type, int column, int angle) {
@@ -114,6 +148,50 @@ void RubiksCube::Redo() {
 
 void RubiksCube::Undo() {
 	// TODO
+}
+
+bool RubiksCube::isSolved()
+{
+	for (size_t i = 0; i < size; i++)
+	{
+		for (size_t j = 0; j < size; j++)
+		{
+			if (data[size*size * 0 + size*i + j] != 0)return false;
+			if (data[size*size * 1 + size*i + j] != 1)return false;
+			if (data[size*size * 2 + size*i + j] != 2)return false;
+			if (data[size*size * 3 + size*i + j] != 3)return false;
+			if (data[size*size * 4 + size*i + j] != 4)return false;
+			if (data[size*size * 5 + size*i + j] != 5)return false;
+		}
+	}
+	return true;
+}
+
+bool RubiksCube::checkMe()
+{
+	int t[100];
+	int a[100];
+	int c[100];
+	std::cout << *this;
+	for (size_t i = 0; i < 100; i++)
+	{
+		t[i] = rand() % 6;
+		a[i] = (rand() % 3) + 1;
+		c[i] = (rand() % (size - 1)) + 1;
+		//	std::cout << cube;
+	}
+	for (size_t i = 0; i < 100; i++)
+	{
+		Rotate(t[i], c[i], a[i]);
+	}
+	std::cout << *this;
+	for (size_t i = 0; i < 100; i++)
+	{
+		int index = 99 - i;
+		Rotate(t[index], c[index], 4 - a[index]);
+	}
+	std::cout << *this;
+	return false;
 }
 
 std::ostream& operator<<(std::ostream& outputStream, const RubiksCube& cube) {
