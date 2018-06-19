@@ -894,7 +894,7 @@ private: System::Void resetButton_Click(System::Object^  sender, System::EventAr
 	this->draw();
 }
 private: System::Void shufflrButton_Click(System::Object^  sender, System::EventArgs^  e) {
-	cube->Shuffle();
+	cube->Shuffle(200);
 	this->draw();
 }
 private: System::Void solveButton_Click(System::Object^  sender, System::EventArgs^  e) {
