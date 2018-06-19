@@ -20,11 +20,20 @@ namespace RubiksCubeSolver {
 		RubiksCubeSimulator(void)
 		{
 			InitializeComponent();
+			this->panel1->MouseWheel += (gcnew System::Windows::Forms::MouseEventHandler(this, &RubiksCubeSimulator::panel1_MouseWheel));
+			mouseDown = false;
+			zoom = 0;
+			cubeTextureID = UINT_MAX;
+			cube = new RubiksCube(3);
 			hDC = GetDC((HWND)(panel1->Handle.ToInt32()));
 			hGLRC = initializeOpenGLContext(hDC);
-			cube = new RubiksCube(3);
+			this->initTexture();
 		}
 		HGLRC initializeOpenGLContext(HDC hDC);
+		void initProgram();
+		void initTexture();
+		void resize();
+		void mouseMove(int x, int y);
 		void draw();
 
 	protected:
@@ -51,6 +60,21 @@ namespace RubiksCubeSolver {
 		HDC hDC;
 		HGLRC hGLRC;
 		RubiksCube* cube;
+		unsigned int programID;
+		unsigned int matrixLocationID;
+		unsigned int projectionMatrixLocationID;
+		unsigned int textureLocationID;
+		unsigned int sizeLocationID;
+		unsigned int cubeTextureID;
+		unsigned int vertexArrayID;
+		float *modelMatrixPtr;
+		float *viewMatrixPtr;
+		float *projectionMatrixPtr;
+		int previousMousePositionX;
+		int previousMousePositionY;
+		float zoom;
+		bool mouseDown;
+
 	private: System::Windows::Forms::TableLayoutPanel^  tableLayoutPanel1;
 	private: System::Windows::Forms::TableLayoutPanel^  tableLayoutPanel2;
 	private: System::Windows::Forms::Button^  rotateButton;
@@ -182,6 +206,9 @@ namespace RubiksCubeSolver {
 			this->panel1->Name = L"panel1";
 			this->panel1->Size = System::Drawing::Size(778, 564);
 			this->panel1->TabIndex = 0;
+			this->panel1->MouseDown += gcnew System::Windows::Forms::MouseEventHandler(this, &RubiksCubeSimulator::panel1_MouseDown);
+			this->panel1->MouseMove += gcnew System::Windows::Forms::MouseEventHandler(this, &RubiksCubeSimulator::panel1_MouseMove);
+			this->panel1->MouseUp += gcnew System::Windows::Forms::MouseEventHandler(this, &RubiksCubeSimulator::panel1_MouseUp);
 			this->panel1->Resize += gcnew System::EventHandler(this, &RubiksCubeSimulator::panel1_Resize);
 			// 
 			// tableLayoutPanel1
@@ -778,6 +805,7 @@ namespace RubiksCubeSolver {
 		this->draw();
 	}
 	private: System::Void panel1_Resize(System::Object^  sender, System::EventArgs^  e) {
+		this->resize();
 		this->draw();
 	}
 	private: System::Void rotateButton_Click(System::Object^  sender, System::EventArgs^  e) {
@@ -792,11 +820,13 @@ namespace RubiksCubeSolver {
 			angle = int::Parse(angleTextBox->Text);
 		} catch (System::FormatException^ e) {}
 		cube->Rotate(type, column, angle);
+		this->initTexture();
 		this->draw();
 	}
 private: System::Void rotateFButton_Click(System::Object^  sender, System::EventArgs^  e) {
 	try {
 		cube->Rotate(0, int::Parse(textBoxF->Text), 1);
+		this->initTexture();
 		this->draw();
 	}
 	catch (System::FormatException^ e) {}
@@ -804,6 +834,7 @@ private: System::Void rotateFButton_Click(System::Object^  sender, System::Event
 private: System::Void rotateRButton_Click(System::Object^  sender, System::EventArgs^  e) {
 	try {
 		cube->Rotate(1, int::Parse(textBoxR->Text), 1);
+		this->initTexture();
 		this->draw();
 	}
 	catch (System::FormatException^ e) {}
@@ -811,6 +842,7 @@ private: System::Void rotateRButton_Click(System::Object^  sender, System::Event
 private: System::Void rotateUButton_Click(System::Object^  sender, System::EventArgs^  e) {
 	try {
 		cube->Rotate(2, int::Parse(textBoxU->Text), 1);
+		this->initTexture();
 		this->draw();
 	}
 	catch (System::FormatException^ e) {}
@@ -818,6 +850,7 @@ private: System::Void rotateUButton_Click(System::Object^  sender, System::Event
 private: System::Void rotateBButton_Click(System::Object^  sender, System::EventArgs^  e) {
 	try {
 		cube->Rotate(3, int::Parse(textBoxB->Text), 1);
+		this->initTexture();
 		this->draw();
 	}
 	catch (System::FormatException^ e) {}
@@ -825,6 +858,7 @@ private: System::Void rotateBButton_Click(System::Object^  sender, System::Event
 private: System::Void rotateLButton_Click(System::Object^  sender, System::EventArgs^  e) {
 	try {
 		cube->Rotate(4, int::Parse(textBoxL->Text), 1);
+		this->initTexture();
 		this->draw();
 	}
 	catch (System::FormatException^ e) {}
@@ -832,6 +866,7 @@ private: System::Void rotateLButton_Click(System::Object^  sender, System::Event
 private: System::Void rotateDButton_Click(System::Object^  sender, System::EventArgs^  e) {
 	try {
 		cube->Rotate(5, int::Parse(textBoxD->Text), 1);
+		this->initTexture();
 		this->draw();
 	}
 	catch (System::FormatException^ e) {}
@@ -839,6 +874,7 @@ private: System::Void rotateDButton_Click(System::Object^  sender, System::Event
 private: System::Void reverseFButton_Click(System::Object^  sender, System::EventArgs^  e) {
 	try {
 		cube->Rotate(0, int::Parse(textBoxF->Text), 3);
+		this->initTexture();
 		this->draw();
 	}
 	catch (System::FormatException^ e) {}
@@ -846,6 +882,7 @@ private: System::Void reverseFButton_Click(System::Object^  sender, System::Even
 private: System::Void reverseRButton_Click(System::Object^  sender, System::EventArgs^  e) {
 	try {
 		cube->Rotate(1, int::Parse(textBoxR->Text), 3);
+		this->initTexture();
 		this->draw();
 	}
 	catch (System::FormatException^ e) {}
@@ -853,6 +890,7 @@ private: System::Void reverseRButton_Click(System::Object^  sender, System::Even
 private: System::Void reverseUButton_Click(System::Object^  sender, System::EventArgs^  e) {
 	try {
 		cube->Rotate(2, int::Parse(textBoxU->Text), 3);
+		this->initTexture();
 		this->draw();
 	}
 	catch (System::FormatException^ e) {}
@@ -860,6 +898,7 @@ private: System::Void reverseUButton_Click(System::Object^  sender, System::Even
 private: System::Void reverseBButton_Click(System::Object^  sender, System::EventArgs^  e) {
 	try {
 		cube->Rotate(3, int::Parse(textBoxB->Text), 3);
+		this->initTexture();
 		this->draw();
 	}
 	catch (System::FormatException^ e) {}
@@ -867,6 +906,7 @@ private: System::Void reverseBButton_Click(System::Object^  sender, System::Even
 private: System::Void reverseLButton_Click(System::Object^  sender, System::EventArgs^  e) {
 	try {
 		cube->Rotate(4, int::Parse(textBoxL->Text), 3);
+		this->initTexture();
 		this->draw();
 	}
 	catch (System::FormatException^ e) {}
@@ -874,6 +914,7 @@ private: System::Void reverseLButton_Click(System::Object^  sender, System::Even
 private: System::Void reverseDButton_Click(System::Object^  sender, System::EventArgs^  e) {
 	try {
 		cube->Rotate(5, int::Parse(textBoxD->Text), 3);
+		this->initTexture();
 		this->draw();
 	}
 	catch (System::FormatException^ e) {}
@@ -891,15 +932,42 @@ private: System::Void resetButton_Click(System::Object^  sender, System::EventAr
 		delete cube;
 		cube = new RubiksCube(size);
 	}
+	this->initTexture();
 	this->draw();
 }
 private: System::Void shufflrButton_Click(System::Object^  sender, System::EventArgs^  e) {
 	cube->Shuffle();
+	this->initTexture();
 	this->draw();
 }
 private: System::Void solveButton_Click(System::Object^  sender, System::EventArgs^  e) {
 	cube->Solve();
+	this->initTexture();
 	this->draw();
+}
+private: System::Void panel1_MouseMove(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+	if (mouseDown) {
+		mouseMove(e->X - previousMousePositionX, e->Y - previousMousePositionY);
+		previousMousePositionX = e->X;
+		previousMousePositionY = e->Y;
+	}
+}
+private: System::Void panel1_MouseDown(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+	previousMousePositionX = e->X;
+	previousMousePositionY = e->Y;
+	mouseDown = true;
+}
+private: System::Void panel1_MouseUp(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+	mouseDown = false;
+}
+private: System::Void panel1_MouseWheel(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+	if (e->Delta< 0) {
+		zoom += 0.1;
+	}
+	else {
+		zoom -= 0.1;
+	}
+	mouseMove(0, 0);
 }
 };
 }
