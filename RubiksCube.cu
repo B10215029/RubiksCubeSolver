@@ -5,7 +5,228 @@
 RubiksCube::RubiksCube(int size) {
 	this->size = size;
 	this->data = new unsigned char[size * size * 6];
+	if (size == 2) {
+		//first face
+		condition.push_back(0);
+		condition.push_back(0);
+		condition.push_back(1);
+		condition.push_back(0);
+		condition.push_back(2);
+		condition.push_back(0);
+		condition.push_back(3);
+		condition.push_back(0);
+		//up edge
+		condition.push_back(10);
+		condition.push_back(2);
+		condition.push_back(11);
+		condition.push_back(2);
+		//left edge
+		condition.push_back(17);
+		condition.push_back(4);
+		condition.push_back(19);
+		condition.push_back(4);
+		//down edge
+		condition.push_back(20);
+		condition.push_back(5);
+		condition.push_back(21);
+		condition.push_back(5);
+		//right edge
+		condition.push_back(4);
+		condition.push_back(1);
+		condition.push_back(6);
+		condition.push_back(1);
+		
+		//up back edge
+		condition.push_back(8);
+		condition.push_back(2);
+		condition.push_back(9);
+		condition.push_back(2);
+		//left back edge
+		condition.push_back(16);
+		condition.push_back(4);
+		condition.push_back(18);
+		condition.push_back(4);
+		//down back edge
+		condition.push_back(22);
+		condition.push_back(5);
+		condition.push_back(23);
+		condition.push_back(5);
+		//right back edge
+		condition.push_back(5);
+		condition.push_back(1);
+		condition.push_back(7);
+		condition.push_back(1);
+		//back face
+		condition.push_back(12);
+		condition.push_back(3);
+		condition.push_back(13);
+		condition.push_back(3);
+		condition.push_back(14);
+		condition.push_back(3);
+		condition.push_back(15);
+		condition.push_back(3);
+	}
+	if (false) {
+		int RULDIndex[4] = { 13,22,40,49 };
+		int RULDColor[4] = { 1,2,4,5 };
+		int crossIndex[4] = { -3,1,3,-1 };
+		int cornerIndex[4] = { -4,-2,4,2 };
+		int edgeLeft[3] = { -4,-1,2 };
+		int edgeRight[3] = { -2,1,4 };
+		int edgeUp[3] = { -4,-3,-2 };
+		int edgeDown[3] = { 2,3,4 };
+		int UDL [3] = { -3,0,3 };
+		int RLL [3] = { -1,0,1 };
+		int faceIndex = 4;
+		int faceColor = 0;
+		//F center
+		condition.push_back(faceIndex);
+		condition.push_back(0);
+		//F cross
+		for (size_t i = 0; i < 4; i++)
+		{
+			ConditionPush(condition, faceIndex + crossIndex[i], faceColor);
+		}
+		//F corner
+		for (size_t i = 0; i < 4; i++)
+		{
+			ConditionPush(condition, faceIndex + cornerIndex[i], faceColor);
+		}
+		//R edge
+		faceColor = 1;
+		faceIndex = 13;
+		for (size_t i = 0; i < 3; i++)
+		{
+			ConditionPush(condition, faceIndex + edgeLeft[i], faceColor);
+		}
+		//U edge
+		faceColor = 2;
+		faceIndex = 22;
+		for (size_t i = 0; i < 3; i++)
+		{
+			ConditionPush(condition, faceIndex + edgeDown[i], faceColor);
+		}
+		//L edge
+		faceColor = 4;
+		faceIndex = 40;
+		for (size_t i = 0; i < 3; i++)
+		{
+			ConditionPush(condition, faceIndex + edgeRight[i], faceColor);
+		}
+		//D edge
+		faceColor = 5;
+		faceIndex = 49;
+		for (size_t i = 0; i < 3; i++)
+		{
+			ConditionPush(condition, faceIndex + edgeUp[i], faceColor);
+		}
+		//ring center
+		for (size_t i = 0; i < 4; i++)
+		{
+			ConditionPush(condition, RULDIndex[i], RULDColor[i]);
+		}
+		//R middle
+		faceColor = 1;
+		faceIndex = 13;
+		for (size_t i = 0; i < 3; i++)
+		{
+			ConditionPush(condition, faceIndex + UDL[i], faceColor);
+		}
+		//U middle
+		faceColor = 2;
+		faceIndex = 22;
+		for (size_t i = 0; i < 3; i++)
+		{
+			ConditionPush(condition, faceIndex + RLL[i], faceColor);
+		}
+		//L middle
+		faceColor = 4;
+		faceIndex = 40;
+		for (size_t i = 0; i < 3; i++)
+		{
+			ConditionPush(condition, faceIndex + UDL[i], faceColor);
+		}
+		//D middle
+		faceColor = 5;
+		faceIndex = 49;
+		for (size_t i = 0; i < 3; i++)
+		{
+			ConditionPush(condition, faceIndex + RLL[i], faceColor);
+		}
+	}
+	if (size == 3) {
+		int RULDIndex[4] = { 13,22,40,49 };
+		int RULDColor[4] = { 1,2,4,5 };
+		int RULD2F[4] = { -1,3,1,-3 };
+		int RULD2B[4] = { 1,-3,-1,3 };
+		int RULD2FRC[4] = { 2,4,-2,-4 };
+		int RULD2FLC[4] = { -4,2,4,-2 };
+		int RULD2MLE[4] = {-3,-1,3,1};
+		int RULD2MRE[4] = { 3,1,-3,-1 };
+		int RULD2BRC[4] = {4,-2,-4,2};
+		int RULD2BLC[4] = {-2,-4,2,4};
+
+		int crossIndex[4] = { 1,-3,-1,3};
+		int cornerIndex[4] = { -2,-4,2,4 };
+		int edgeLeft[3] = { -4,-1,2 };
+		int edgeRight[3] = { -2,1,4 };
+		int edgeUp[3] = { -4,-3,-2 };
+		int edgeDown[3] = { 2,3,4 };
+		int UDL[3] = { -3,0,3 };
+		int RLL[3] = { -1,0,1 };
+		int faceIndex = 4;
+		int faceColor = 0;
+		//F center
+		condition.push_back(faceIndex);
+		condition.push_back(0);
+		//F cross
+		for (size_t i = 0; i < 4; i++)
+		{
+			ConditionPush(condition, faceIndex + crossIndex[i], faceColor);
+			ConditionPush(condition, RULDIndex[i]+ RULD2F[i], RULDColor[i]);
+		}
+		//F conor
+		for (size_t i = 0; i < 4; i++)
+		{
+			int plusIndex = (i + 1) % 4;
+			ConditionPush(condition, faceIndex + cornerIndex[i], faceColor);
+			ConditionPush(condition, RULDIndex[i] + RULD2FLC[i], RULDColor[i]);
+			ConditionPush(condition, RULDIndex[plusIndex] + RULD2FRC[plusIndex], RULDColor[plusIndex]);
+		}
+		//middle conor
+		for (size_t i = 0; i < 4; i++)
+		{
+			int plusIndex = (i + 1) % 4;
+			ConditionPush(condition, RULDIndex[i] + RULD2MLE[i], RULDColor[i]);
+			ConditionPush(condition, RULDIndex[plusIndex] + RULD2MRE[plusIndex], RULDColor[plusIndex]);
+		}
+		//B cross Face
+		faceIndex = 31;
+		faceColor = 3;
+		for (size_t i = 0; i < 4; i++)
+		{
+			ConditionPush(condition, faceIndex + crossIndex[i], faceColor);
+		}
+		//B corner Face
+		for (size_t i = 0; i < 4; i++)
+		{
+			ConditionPush(condition, faceIndex + cornerIndex[i], faceColor);
+		}
+		//RULD B Conr Face
+		for (size_t i = 0; i < 4; i++)
+		{
+			int plusIndex = (i + 1) % 4;
+			ConditionPush(condition, RULDIndex[i] + RULD2BLC[i], RULDColor[i]);
+			ConditionPush(condition, RULDIndex[plusIndex] + RULD2BRC[plusIndex], RULDColor[plusIndex]);
+		}
+		//RULD B Cross Face
+		for (size_t i = 0; i < 4; i++)
+		{
+			ConditionPush(condition, RULDIndex[i] + RULD2B[i], RULDColor[i]);
+		}
+	}
 	Reset();
+	t = clock();
 }
 
 RubiksCube::~RubiksCube() {
@@ -24,46 +245,392 @@ void RubiksCube::Reset() {
 	memset(this->data + size * size * 5, 5, sizeof(unsigned char) * size * size);
 }
 
-void RubiksCube::Shuffle() {
-	for (size_t i = 0; i < 200; i++)
+void RubiksCube::Shuffle(int time) {
+	for (size_t i = 0; i < time; i++)
 	{
 		int type = rand() % 6;
-		int column = (rand() % (size - 1)) + 1;
+		int column = (rand() % (int)(size - 2))+1;
 		int angle = (rand() % 3) + 1;
 		Rotate(type, column, angle);
 	}
 }
 
 void RubiksCube::Solve() {
-	if (SolveTree(1, 15)) {
-		std::cout << "success" << std::endl;
+	int step = 0;
+	t = clock();
+	//condition.size()/2
+	//for (size_t i = 0; i < condition.size() / 2; i++)
+	//{
+	//	if (!SolveTree(1, 6, -1,i)) {
+	//		std::cout <<"step "<< i << " fail" << std::endl;
+	//		break;
+	//		Shuffle(6);
+	//		//magicTreak();
+	//		i = -1;
+	//		continue;
+	//	}
+	//	std::cout << "step "<< i <<" pass" << std::endl;
+	//}
+	//std::cout << "success" << std::endl;
+	//step 1,2 solve D layer cross,conor
+	//we belive that we can do least 6 move search to complete this set
+	//<= condition.size()/2
+	for (size_t i = 0; i <= 21; i++)
+	{
+		if (!SolveTree(1, 6, -1, i)) {
+			std::cout << "step " << i << " fail" << std::endl;
+			break;
+		}
+		step = i;
+		std::cout << "step " << i << " pass" << std::endl;
+	}
+	//step 3 solve middle layer coner
+	std::cout << "solve middle " << std::endl;
+	for (size_t i = step; i <= 29; i++)
+	{
+		if (!SolveMiddle(1, 3, -1, i)) {
+			std::cout << "step " << i << " fail" << std::endl;
+			break;
+		}
+		step = i;
+		std::cout << "step " << i << " pass" << std::endl;
+	}
+	//step 4 B cross face
+	std::cout << "solve B cross" << std::endl;
+	for (size_t i = step; i <= 33; i++)
+	{
+		if (!SolveBCross(1, 3, -1, i)) {
+			std::cout << "step " << i << " fail" << std::endl;
+			break;
+		}
+		step = i;
+		std::cout << "step " << i << " pass" << std::endl;
+	}
+	//step 5 B Corner face
+	if (!SolveBCorner(1, 4, -1, 37)) {
+		std::cout << "solve BCorner fail" << std::endl;
 	}
 	else {
-		std::cout << "fail" << std::endl;
+		std::cout << "BCorner pass" << std::endl;
+	}
+	//step6 B Coner Swape
+	if (!SolveBCornerSwap(1, 3, -1, 37 + 8)) {
+		std::cout << "solve BCornerSwap fail" << std::endl;
+	}
+	else {
+		std::cout << "solve BCornerSwap pass" << std::endl;
+	}
+	//step7 B Cross swapeSolveBCrossSwap
+	if (!SolveBCrossSwap(1,2, -1, 37 + 8+4)) {
+		std::cout << "solve BCrossSwap fail" << std::endl;
+	}
+	else {
+		std::cout << "solve BCrossSwap pass" << std::endl;
 	}
 }
-
-bool RubiksCube::SolveTree(int turn, int maxTurn)
-{
+bool RubiksCube::SolveMiddle(int turn,int maxTurn,int lastFace,int step) {
+	if (isSolvedPart(step))
+		return true;
 	if (turn > maxTurn)
 		return false;
-	for (size_t type = 0; type < 6; type++)
+	clock_t pass = clock() - t;
+	//printf("It took me %d clicks (%f seconds).\n", t, ((float)t) / CLOCKS_PER_SEC);
+	if ((float)pass / CLOCKS_PER_SEC > 120) {
+		return false;
+	}
+	std::vector<int> table{ 4,2,1,5 };
+	std::vector<int> angles{ 1,2,3 };
+	std::random_shuffle(angles.begin(), angles.end());
+	for (size_t i = 0; i < table.size(); i++)
 	{
-		for (size_t column = 1; column < size; column++)
+		int R = table[(i + 1) % table.size()];
+		int F = table[i];
+		int L = table[(i - 1 + table.size()) % table.size()];
+		int U = 3;
+		int D = 0;
+		int column = 1;
+		for (size_t angle = 0; angle < angles.size(); angle++)
 		{
-			for (size_t angle = 1; angle < 4; angle++)
+			for (size_t j = 0; j < 2; j++)
 			{
-				Rotate(type, column, angle);
-				if (isSolved())
+				Rotate(U, column, angles[angle]);
+				if (j == 0) {
+					Rotate(U, column, 1);
+					Rotate(R, column, 1);
+					Rotate(U, column, 3);
+					Rotate(R, column, 3);
+					Rotate(U, column, 3);
+					Rotate(F, column, 3);
+					Rotate(U, column, 1);
+					Rotate(F, column, 1);
+				}
+				else if (j == 1) {
+					Rotate(U, column, 3);
+					Rotate(L, column, 3);
+					Rotate(U, column, 1);
+					Rotate(L, column, 1);
+					Rotate(U, column, 1);
+					Rotate(F, column, 1);
+					Rotate(U, column, 3);
+					Rotate(F, column, 3);
+				}
+				if (SolveMiddle(turn + 1, maxTurn, -1, step))
 					return true;
-				else if (SolveTree(turn + 1, maxTurn))
-					return true;
-				else
-					Rotate(type, column, 4 - angle);
+				else {
+					if (j == 0) {
+						Rotate(F, column, 3);
+						Rotate(U, column, 3);
+						Rotate(F, column, 1);
+						Rotate(U, column, 1);
+						Rotate(R, column, 1);
+						Rotate(U, column, 1);
+						Rotate(R, column, 3);
+						Rotate(U, column, 3);
+					}
+					else if (j == 1) {
+						Rotate(F, column, 1);
+						Rotate(U, column, 1);
+						Rotate(F, column, 3);
+						Rotate(U, column, 3);
+						Rotate(L, column, 3);
+						Rotate(U, column, 3);
+						Rotate(L, column, 1);
+						Rotate(U, column, 1);
+					}
+					Rotate(U, column, 4 - angles[angle]);
+				}
+				
+			}	
+		}
+	}
+	return false;
+}
+bool RubiksCube::SolveBCross(int turn, int maxTurn, int lastFace, int step)
+{
+	if (isSolvedPart(step))
+		return true;
+	if (turn > maxTurn)
+		return false;
+	clock_t pass = clock() - t;
+	//printf("It took me %d clicks (%f seconds).\n", t, ((float)t) / CLOCKS_PER_SEC);
+	if ((float)pass / CLOCKS_PER_SEC > 120) {
+		return false;
+	}
+	std::vector<int> table{ 4,2,1,5 };
+	for (size_t i = 0; i < table.size(); i++)
+	{
+		int R = table[(i + 1) % table.size()];
+		int F = table[i];
+		int L = table[(i - 1 + table.size()) % table.size()];
+		int U = 3;
+		int D = 0;
+		int column = 1;
+		for (size_t j = 0; j < 2; j++)
+		{
+			Rotate(F, column, 1);
+			Rotate(R, column, 1);
+			Rotate(U, column, 1);
+			Rotate(R, column, 3);
+			Rotate(U, column, 3);
+			Rotate(F, column, 3);
+			if (SolveMiddle(turn + 1, maxTurn, -1, step))
+				return true;
+			else {
+				Rotate(F, column, 1);
+				Rotate(U, column, 1);
+				Rotate(R, column, 1);
+				Rotate(U, column, 3);
+				Rotate(R, column, 3);
+				Rotate(F, column, 3);
 			}
 		}
 	}
 	return false;
+}
+bool RubiksCube::SolveBCorner(int turn, int maxTurn, int lastFace, int step)
+{
+	if (isSolvedPart(step))
+		return true;
+	if (turn > maxTurn)
+		return false;
+	clock_t pass = clock() - t;
+	//printf("It took me %d clicks (%f seconds).\n", t, ((float)t) / CLOCKS_PER_SEC);
+	if ((float)pass / CLOCKS_PER_SEC > 120) {
+		return false;
+	}
+	std::vector<int> table{ 4,2,1,5 };
+	for (size_t i = 0; i < table.size(); i++)
+	{
+		int R = table[(i + 1) % table.size()];
+		int F = table[i];
+		int L = table[(i - 1 + table.size()) % table.size()];
+		int U = 3;
+		int D = 0;
+		int column = 1;
+		Rotate(R, column, 3);
+		Rotate(U, column, 2);
+		Rotate(R, column, 1);
+		Rotate(U, column, 1);
+		Rotate(R, column, 3);
+		Rotate(U, column, 1);
+		Rotate(R, column, 1);
+		if (SolveBCorner(turn + 1, maxTurn, -1, step))
+			return true;
+		else {
+			Rotate(R, column, 3);
+			Rotate(U, column, 3);
+			Rotate(R, column, 1);
+			Rotate(U, column, 3);
+			Rotate(R, column, 3);
+			Rotate(U, column, 2);
+			Rotate(R, column, 1);
+		}
+	}
+	return false;
+}
+bool RubiksCube::SolveBCornerSwap(int turn, int maxTurn, int lastFace, int step)
+{
+	if (isSolvedPart(step))
+		return true;
+	if (turn > maxTurn)
+		return false;
+	clock_t pass = clock() - t;
+	//printf("It took me %d clicks (%f seconds).\n", t, ((float)t) / CLOCKS_PER_SEC);
+	if ((float)pass / CLOCKS_PER_SEC > 120) {
+		return false;
+	}
+	std::vector<int> table{ 4,2,1,5 };
+	std::vector<int> angles{ 1,2,3 };
+	std::random_shuffle(angles.begin(), angles.end());
+	for (size_t i = 0; i < table.size(); i++)
+	{
+		int R = table[(i + 1) % table.size()];
+		int F = table[i];
+		int L = table[(i - 1 + table.size()) % table.size()];
+		int B = table[(i + 2) % table.size()];
+		int U = 3;
+		int D = 0;
+		int column = 1;
+		for (size_t angle = 0; angle < angles.size(); angle++)
+		{
+			Rotate(U, column, angles[angle]);
+			Rotate(R, column, 3);
+			Rotate(F, column, 1);
+			Rotate(R, column, 3);
+			Rotate(B, column, 2);
+			Rotate(R, column, 1);
+			Rotate(F, column, 3);
+			Rotate(R, column, 3);
+			Rotate(B, column, 2);
+			Rotate(R, column, 2);
+			if (SolveBCornerSwap(turn + 1, maxTurn, -1, step))
+				return true;
+			else {
+				Rotate(R, column, 2);
+				Rotate(B, column, 2);
+				Rotate(R, column, 1);
+				Rotate(F, column, 1);
+				Rotate(R, column, 3);
+				Rotate(B, column, 2);
+				Rotate(R, column, 1);
+				Rotate(F, column, 3);
+				Rotate(R, column, 1);
+				Rotate(U, column, 4 - angles[angle]);
+			}
+			
+			
+		}
+		
+	}
+	return false;
+}
+bool RubiksCube::SolveBCrossSwap(int turn, int maxTurn, int lastFace, int step)
+{
+	if (isSolvedPart(step))
+		return true;
+	if (turn > maxTurn)
+		return false;
+	clock_t pass = clock() - t;
+	//printf("It took me %d clicks (%f seconds).\n", t, ((float)t) / CLOCKS_PER_SEC);
+	if ((float)pass / CLOCKS_PER_SEC > 120) {
+		return false;
+	}
+	std::vector<int> table{ 4,2,1,5 };
+	for (size_t i = 0; i < table.size(); i++)
+	{
+		int R = table[(i + 1) % table.size()];
+		int F = table[i];
+		int L = table[(i - 1 + table.size()) % table.size()];
+		int U = 3;
+		int D = 0;
+		int column = 1;
+		Rotate(R, column, 1);
+		Rotate(U, column, 3);
+		Rotate(R, column, 1);
+		Rotate(U, column, 1);
+		Rotate(R, column, 1);
+		Rotate(U, column, 1);
+		Rotate(R, column, 1);
+		Rotate(U, column, 3);
+		Rotate(R, column, 3);
+		Rotate(U, column, 3);
+		Rotate(R, column, 2);
+		if (SolveBCrossSwap(turn + 1, maxTurn, -1, step))
+			return true;
+		else {
+			Rotate(R, column, 2);
+			Rotate(U, column, 1);
+			Rotate(R, column, 1);
+			Rotate(U, column, 1);
+			Rotate(R, column, 3);
+			Rotate(U, column, 3);
+			Rotate(R, column, 3);
+			Rotate(U, column, 3);
+			Rotate(R, column, 3);
+			Rotate(U, column, 1);
+			Rotate(R, column, 3);
+		}
+	}
+	return false;
+}
+bool RubiksCube::SolveTree(int turn, int maxTurn,int lastFace,int step)
+{
+	if (isSolvedPart(step))
+		return true;
+	if (turn > maxTurn)
+		return false;
+	clock_t pass = clock() - t;
+	//printf("It took me %d clicks (%f seconds).\n", t, ((float)t) / CLOCKS_PER_SEC);
+	if ((float)pass / CLOCKS_PER_SEC > 120) {
+		return false;
+	}
+	std::vector<int> types{1,2,3,4,5};//never do the F TURN
+	std::vector<int> angles{ 1,2,3 };
+	std::random_shuffle(types.begin(), types.end());
+	std::random_shuffle(angles.begin(), angles.end());
+	for (size_t type = 0; type < types.size(); type++)
+	{
+		if (lastFace == types[type])
+			continue;
+		for (size_t column = 1; column <= (int)(size/2); column++)
+		{
+			for (size_t angle = 0; angle < angles.size(); angle++)
+			{
+				Rotate(types[type], column, angles[angle]);
+				if (SolveTree(turn + 1, maxTurn, types[type], step))
+					return true;
+				else
+					Rotate(types[type], column, 4 - angles[angle]);
+			}
+		}
+	}
+	return false;
+}
+
+void RubiksCube::ConditionPush(std::vector<int> &v, int index, int color)
+{
+	v.push_back(index);
+	v.push_back(color);
 }
 
 void RubiksCube::Rotate(OperateType type, int column, int angle) {
@@ -165,6 +732,33 @@ bool RubiksCube::isSolved()
 		}
 	}
 	return true;
+}
+
+bool RubiksCube::isSolvedPart(int step)
+{
+	if (size == 2) {
+		bool flag = true;
+		for (size_t i = 0; i < step; i++)
+		{
+			if (data[condition[i * 2]] != condition[i * 2 + 1]) {
+				flag = false;
+				break;
+			}
+		}
+		return flag;
+	}
+	if (size == 3) {
+		bool flag = true;
+		for (size_t i = 0; i < step; i++)
+		{
+			if (data[condition[i * 2]] != condition[i * 2 + 1]) {
+				flag = false;
+				break;
+			}
+		}
+		return flag;
+	}
+	return false;
 }
 
 bool RubiksCube::checkMe()

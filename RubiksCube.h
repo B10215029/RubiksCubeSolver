@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
-
+#include <vector>
+#include <algorithm>    // std::random_shuffle
+#include <time.h>
 class RubiksCube {
 public:
 	//   U
@@ -17,7 +19,7 @@ public:
 	RubiksCube(int size);
 	~RubiksCube();
 	void Reset();
-	void Shuffle();
+	void Shuffle(int time);
 	void Solve();
 	/// <summary>
 	/// ±ÛÂà¬Y­Ó­±
@@ -37,8 +39,17 @@ public:
 	void Undo();
 	friend std::ostream& operator<<(std::ostream& outputStream, const RubiksCube& cube);
 	bool isSolved();
+	bool isSolvedPart(int step);
 	bool checkMe();
-	bool SolveTree(int turn, int maxTurn);
+	bool SolveTree(int turn, int maxTurn,int lastFace,int step);
+	void ConditionPush(std::vector<int> &v, int index, int color);
+	bool SolveMiddle(int turn, int maxTurn, int lastFace, int step);
+	bool SolveBCross(int turn, int maxTurn, int lastFace, int step);
+	bool SolveBCorner(int turn, int maxTurn, int lastFace, int step);
+	bool SolveBCornerSwap(int turn, int maxTurn, int lastFace, int step);
+	bool SolveBCrossSwap(int turn, int maxTurn, int lastFace, int step);
+	std::vector<int> condition;
+	clock_t t;
 private:
 	int lastFace;
 };
