@@ -252,6 +252,7 @@ void RubiksCubeSolver::RubiksCubeSimulator::initProgram() {
 }
 
 void RubiksCubeSolver::RubiksCubeSimulator::initTexture() {
+	cube->SynchronizeData();
 	wglMakeCurrent(hDC, hGLRC);
 	GLuint cubeTextureID = this->cubeTextureID;
 	if (cubeTextureID == UINT_MAX) {
@@ -285,13 +286,13 @@ void RubiksCubeSolver::RubiksCubeSimulator::draw()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTextureID);
 	glUniform1i(textureLocationID, 0);
-	glUniform1i(sizeLocationID, cube->size);
+	glUniform1i(sizeLocationID, this->checkBox1->Checked ? cube->size : 0);
 	glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
 	glBindVertexArray(0);
 
 	wglMakeCurrent(NULL, NULL);
-	this->labelHtm->Text = "HTM: " + cube->htm;
-	this->labelQtm->Text = "QTM: " + cube->qtm;
+	this->UpdateHTM();
+	this->UpdateQTM();
 }
 
 void RubiksCubeSolver::RubiksCubeSimulator::resize() {

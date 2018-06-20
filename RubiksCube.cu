@@ -1,10 +1,20 @@
 #include "RubiksCube.h"
 #include <string>
 #include <iostream>
+#include <cuda_runtime.h>
+#include <device_launch_parameters.h>
+
+__device__ __host__ int CeilDiv(int a, int b) { return (a - 1) / b + 1; }
+__device__ __host__ int CeilAlign(int a, int b) { return CeilDiv(a, b) * b; }
 
 RubiksCube::RubiksCube(int size) {
 	this->size = size;
 	this->data = new unsigned char[size * size * 6];
+	useHost = size < 100;
+	cudaDataIndex = 0;
+	for (int i = 0; i < CUDA_DATA_LEN; i++) {
+		cudaMalloc(cudaData + i, sizeof(unsigned char) * size * size * 6);
+	}
 	if (size == 2) {
 		//first face
 		condition.push_back(0);
@@ -231,18 +241,37 @@ RubiksCube::RubiksCube(int size) {
 
 RubiksCube::~RubiksCube() {
 	delete[] this->data;
+	for (int i = 0; i < CUDA_DATA_LEN; i++) {
+		cudaFree(cudaData[i]);
+	}
+}
+
+__global__ void CudaReset(unsigned char* data, int size) {
+	const int index = blockIdx.x * blockDim.x + threadIdx.x;
+	unsigned char type = index / (size * size);
+	if (type < 6) {
+		data[index] = type;
+	}
 }
 
 void RubiksCube::Reset() {
 	this->htm = 0;
 	this->qtm = 0;
 	this->lastFace = -1;
-	memset(this->data + size * size * 0, 0, sizeof(unsigned char) * size * size);
-	memset(this->data + size * size * 1, 1, sizeof(unsigned char) * size * size);
-	memset(this->data + size * size * 2, 2, sizeof(unsigned char) * size * size);
-	memset(this->data + size * size * 3, 3, sizeof(unsigned char) * size * size);
-	memset(this->data + size * size * 4, 4, sizeof(unsigned char) * size * size);
-	memset(this->data + size * size * 5, 5, sizeof(unsigned char) * size * size);
+	if (useHost) {
+		memset(this->data + size * size * 0, 0, sizeof(unsigned char) * size * size);
+		memset(this->data + size * size * 1, 1, sizeof(unsigned char) * size * size);
+		memset(this->data + size * size * 2, 2, sizeof(unsigned char) * size * size);
+		memset(this->data + size * size * 3, 3, sizeof(unsigned char) * size * size);
+		memset(this->data + size * size * 4, 4, sizeof(unsigned char) * size * size);
+		memset(this->data + size * size * 5, 5, sizeof(unsigned char) * size * size);
+	} else {
+		CudaReset << <dim3(CeilDiv(size * size * 6, 32)), dim3(32) >> >(cudaData[0], size);
+		//for (int i = 1; i < CUDA_DATA_LEN; i++) {
+		//	cudaMemcpy(cudaData[i], cudaData[0], sizeof(unsigned char) * size * size * 6, cudaMemcpyDeviceToDevice);
+		//}
+		//cudaMemcpy(this->data, cudaData[0], sizeof(unsigned char) * size * size * 6, cudaMemcpyDeviceToHost);
+	}
 }
 
 void RubiksCube::Shuffle(int time) {
@@ -261,27 +290,19 @@ void RubiksCube::Solve() {
 	t = clock();
 	if (size == 2) {
 		std::vector<int> types{ 0,1,2 };
-		for (size_t i = 0; i < 500; i++)
-		{
-			t = clock();
-			Shuffle(200);
-			int phase = 1;
-			//solve to lasted 2 step
-			if (!directSearch2x2Tree(1, 9, -1, types, phase)) {
-				std::cout << "faild phase 1 QQ" << std::endl;
-				break;
-			}
-			else {
-				phase++;
-				if(!directSearch2x2Tree(1, 3, -1, types, phase)) {
-					std::cout << "faild phase 2 QQ" << std::endl;
-					break;
-				}
-			}
-			//solve final 2 step;
-			clock_t pass = clock() - t;
-			std::cout << "pass time: " << (float)pass / CLOCKS_PER_SEC << " second." << std::endl;
+		int phase = 1;
+		//solve to lasted 2 step
+		if (!directSearch2x2Tree(1, 9, -1, types, phase)) {
+			std::cout << "faild phase 1 QQ" << std::endl;
 		}
+		else {
+			phase++;
+			if (!directSearch2x2Tree(1, 3, -1, types, phase)) {
+				std::cout << "faild phase 2 QQ" << std::endl;
+			}
+		}
+		clock_t pass = clock() - t;
+		std::cout << "pass time: " << (float)pass / CLOCKS_PER_SEC << " second." << std::endl;
 		return;
 	}
 	//condition.size()/2
@@ -686,6 +707,72 @@ void RubiksCube::Rotate(OperateType type, int column, int angle) {
 	Rotate((int)type, angle, column);
 }
 
+__global__ void CudaRotate(unsigned char *dst, unsigned char *src, int size, int type, int column, int angle) {
+	// 紀錄每個面周圍有哪幾個面(順時針，上右下左前後)
+	static const int relatedFace[6][6] = {
+		{ 2, 1, 5, 4, 0, 3 },
+		{ 2, 3, 5, 0, 1, 4 },
+		{ 3, 1, 0, 4, 2, 5 },
+		{ 2, 4, 5, 1, 3, 0 },
+		{ 2, 0, 5, 3, 4, 1 },
+		{ 0, 1, 3, 4, 5, 2 },
+	};
+	// 紀錄每個面周圍的面與自己相連的方向
+	static const int relatedFaceDirection[6][4] = {
+		{ 2, 3, 0, 1 },
+		{ 1, 3, 1, 1 },
+		{ 0, 0, 0, 0 },
+		{ 0, 3, 2, 1 },
+		{ 3, 3, 3, 1 },
+		{ 2, 2, 2, 2 },
+	};
+	int index = blockIdx.x * blockDim.x + threadIdx.x;
+	const unsigned char indexType = index / (size * size);
+	if (indexType < 6) {
+		const int typeIndex = index % (size * size);
+		const int x = typeIndex % size;
+		const int y = typeIndex / size;
+		unsigned char srcFace, dstFace;
+		srcFace = dstFace = relatedFace[type][indexType];
+		bool skip = false;
+
+		if (indexType < 4) {
+			dstFace = relatedFace[type][(indexType + angle) % 4];
+			angle = relatedFaceDirection[type][(indexType + angle) % 4] - relatedFaceDirection[type][indexType];
+			if (relatedFaceDirection[type][indexType] == 0) {
+				skip = y >= column;
+			}
+			else if (relatedFaceDirection[type][indexType] == 1) {
+				skip = x < size - column;
+			}
+			else if (relatedFaceDirection[type][indexType] == 2) {
+				skip = y < size - column;
+			}
+			else if (relatedFaceDirection[type][indexType] == 3) {
+				skip = x >= column;
+			}
+		}
+		//else if (indexType == 4) {
+		//	angle = angle;
+		//}
+		else if (indexType == 5) {
+			angle = 4 - angle;
+			skip = size != column;
+		}
+
+		int newIndex = index = size * size * srcFace + typeIndex;
+		if (!skip) {
+			newIndex = size * size * dstFace;
+			angle = (angle % 4 + 4) % 4;
+			if (angle == 0) newIndex += typeIndex; // y * size + x;
+			if (angle == 1) newIndex += x * size + (size - 1 - y);
+			if (angle == 2) newIndex += (size - 1 - y) * size + (size - 1 - x);
+			if (angle == 3) newIndex += (size - 1 - x) * size + y;
+		}
+		dst[newIndex] = src[index];
+	}
+}
+
 // 把矩陣旋轉然後寫到另一個矩陣
 void RotateArray(unsigned char *dst, unsigned char *src, int size, int angle) {
 	angle = (angle % 4 + 4) % 4;
@@ -722,10 +809,7 @@ static const int relatedFaceDirection[6][4] = {
 	{ 2, 2, 2, 2 },
 };
 
-void RubiksCube::Rotate(int type, int column, int angle) {
-	htm += lastFace != type;
-	lastFace = type;
-	qtm += (angle == 2) + 1;
+void RubiksCube::HostRotate(int type, int column, int angle) {
 	// 旋轉整個面
 	unsigned char *buffer = new unsigned char[size * size];
 	RotateArray(buffer, data + size * size * type, size, angle);
@@ -743,18 +827,35 @@ void RubiksCube::Rotate(int type, int column, int angle) {
 	for (int i = 0; i < 4; i++) {
 		if (relatedFaceDirection[type][i] == 0) {
 			memcpy(data + size * size * relatedFace[type][i], buffers[i], sizeof(unsigned char) * size * column);
-		} else if (relatedFaceDirection[type][i] == 1) {
+		}
+		else if (relatedFaceDirection[type][i] == 1) {
 			for (int y = 0; y < size; y++) {
 				memcpy(data + size * size * relatedFace[type][i] + size * y + (size - column), buffers[i] + size * y + (size - column), sizeof(unsigned char) * column);
 			}
-		} else if (relatedFaceDirection[type][i] == 2) {
+		}
+		else if (relatedFaceDirection[type][i] == 2) {
 			memcpy(data + size * size * relatedFace[type][i] + size * (size - column), buffers[i] + size * (size - column), sizeof(unsigned char) * size * column);
-		} else if (relatedFaceDirection[type][i] == 3) {
+		}
+		else if (relatedFaceDirection[type][i] == 3) {
 			for (int y = 0; y < size; y++) {
 				memcpy(data + size * size * relatedFace[type][i] + size * y, buffers[i] + size * y, sizeof(unsigned char) * column);
 			}
 		}
 		delete[] buffers[i];
+	}
+}
+
+void RubiksCube::Rotate(int type, int column, int angle) {
+	htm += lastFace != type;
+	lastFace = type;
+	qtm += (angle == 2) + 1;
+	if (useHost) {
+		HostRotate(type, column, angle);
+	} else {
+		unsigned char* src = GetCudaData();
+		SwitchCudaData();
+		unsigned char* dst = GetCudaData();
+		CudaRotate << <dim3(CeilDiv(size * size * 6, 32)), dim3(32) >> >(dst, src, size, type, column, angle);
 	}
 }
 
@@ -764,6 +865,15 @@ void RubiksCube::Redo() {
 
 void RubiksCube::Undo() {
 	// TODO
+}
+
+unsigned char* RubiksCube::SynchronizeData() const {
+	if (useHost) {
+		cudaMemcpy(GetCudaData(), this->data, sizeof(unsigned char) * size * size * 6, cudaMemcpyHostToDevice);
+	} else {
+		cudaMemcpy(this->data, GetCudaData(), sizeof(unsigned char) * size * size * 6, cudaMemcpyDeviceToHost);
+	}
+	return data;
 }
 
 bool RubiksCube::isSolved()
@@ -882,6 +992,7 @@ bool RubiksCube::directSearch2x2Tree(int turn, int maxTurn, int lastFace, std::v
 std::ostream& operator<<(std::ostream& outputStream, const RubiksCube& cube) {
 	static const char color[] = { 'G', 'R', 'W', 'B', 'O', 'Y' };
 	std::string padding(cube.size * 2, ' ');
+	cube.SynchronizeData();
 	for (int i = 0; i < cube.size; i++) {
 		outputStream << padding;
 		for (int j = 0; j < cube.size; j++) {
