@@ -18,6 +18,7 @@ public:
 	//   5
 	unsigned char* data;
 	unsigned char* cudaData[CUDA_DATA_LEN];
+	bool useHost;
 	int cudaDataIndex;
 	RubiksCube(int size);
 	~RubiksCube();
@@ -38,6 +39,7 @@ public:
 	/// <param name="column">轉第幾列(從右邊數)</param>
 	/// <param name="angle">順時針轉幾度(1 = 90, 2 = 180, 3 = 270)</param>
 	void Rotate(int type, int column = 1, int angle = 1);
+	void HostRotate(int type, int column, int angle);
 	void Redo();
 	void Undo();
 	unsigned char* SynchronizeData() const;
