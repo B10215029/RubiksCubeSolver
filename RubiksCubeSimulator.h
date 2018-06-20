@@ -128,6 +128,8 @@ namespace RubiksCubeSolver {
 	private: System::Windows::Forms::Button^  redoButton;
 	private: System::Windows::Forms::Timer^  redoTimer;
 	private: System::Windows::Forms::Timer^  undoTimer;
+private: System::Windows::Forms::TableLayoutPanel^  tableLayoutPanel9;
+private: System::Windows::Forms::TextBox^  textBox1;
 
 
 
@@ -190,6 +192,8 @@ namespace RubiksCubeSolver {
 			this->tableLayoutPanel8 = (gcnew System::Windows::Forms::TableLayoutPanel());
 			this->undoButton = (gcnew System::Windows::Forms::Button());
 			this->redoButton = (gcnew System::Windows::Forms::Button());
+			this->tableLayoutPanel9 = (gcnew System::Windows::Forms::TableLayoutPanel());
+			this->textBox1 = (gcnew System::Windows::Forms::TextBox());
 			this->tableLayoutPanel1->SuspendLayout();
 			this->tableLayoutPanel4->SuspendLayout();
 			this->tableLayoutPanel2->SuspendLayout();
@@ -198,6 +202,7 @@ namespace RubiksCubeSolver {
 			this->tableLayoutPanel6->SuspendLayout();
 			this->tableLayoutPanel7->SuspendLayout();
 			this->tableLayoutPanel8->SuspendLayout();
+			this->tableLayoutPanel9->SuspendLayout();
 			this->SuspendLayout();
 			// 
 			// panel1
@@ -665,13 +670,13 @@ namespace RubiksCubeSolver {
 			this->tableLayoutPanel6->ColumnCount = 1;
 			this->tableLayoutPanel6->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Percent,
 				100)));
+			this->tableLayoutPanel6->Controls->Add(this->tableLayoutPanel9, 0, 3);
 			this->tableLayoutPanel6->Controls->Add(this->tableLayoutPanel7, 0, 0);
 			this->tableLayoutPanel6->Controls->Add(this->resetButton, 0, 1);
-			this->tableLayoutPanel6->Controls->Add(this->shufflrButton, 0, 2);
-			this->tableLayoutPanel6->Controls->Add(this->solveButton, 0, 3);
 			this->tableLayoutPanel6->Controls->Add(this->labelHtm, 0, 5);
 			this->tableLayoutPanel6->Controls->Add(this->labelQtm, 0, 6);
 			this->tableLayoutPanel6->Controls->Add(this->tableLayoutPanel8, 0, 4);
+			this->tableLayoutPanel6->Controls->Add(this->solveButton, 0, 2);
 			this->tableLayoutPanel6->Dock = System::Windows::Forms::DockStyle::Fill;
 			this->tableLayoutPanel6->Location = System::Drawing::Point(624, 3);
 			this->tableLayoutPanel6->Name = L"tableLayoutPanel6";
@@ -752,9 +757,9 @@ namespace RubiksCubeSolver {
 			// shufflrButton
 			// 
 			this->shufflrButton->Dock = System::Windows::Forms::DockStyle::Fill;
-			this->shufflrButton->Location = System::Drawing::Point(3, 57);
+			this->shufflrButton->Location = System::Drawing::Point(3, 3);
 			this->shufflrButton->Name = L"shufflrButton";
-			this->shufflrButton->Size = System::Drawing::Size(145, 21);
+			this->shufflrButton->Size = System::Drawing::Size(107, 21);
 			this->shufflrButton->TabIndex = 1;
 			this->shufflrButton->Text = L"Shuffle";
 			this->shufflrButton->UseVisualStyleBackColor = true;
@@ -763,7 +768,7 @@ namespace RubiksCubeSolver {
 			// solveButton
 			// 
 			this->solveButton->Dock = System::Windows::Forms::DockStyle::Fill;
-			this->solveButton->Location = System::Drawing::Point(3, 84);
+			this->solveButton->Location = System::Drawing::Point(3, 57);
 			this->solveButton->Name = L"solveButton";
 			this->solveButton->Size = System::Drawing::Size(145, 21);
 			this->solveButton->TabIndex = 1;
@@ -836,6 +841,34 @@ namespace RubiksCubeSolver {
 			this->redoButton->MouseDown += gcnew System::Windows::Forms::MouseEventHandler(this, &RubiksCubeSimulator::redoButton_MouseDown);
 			this->redoButton->MouseUp += gcnew System::Windows::Forms::MouseEventHandler(this, &RubiksCubeSimulator::redoButton_MouseUp);
 			// 
+			// tableLayoutPanel9
+			// 
+			this->tableLayoutPanel9->ColumnCount = 2;
+			this->tableLayoutPanel9->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Percent,
+				75)));
+			this->tableLayoutPanel9->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Percent,
+				25)));
+			this->tableLayoutPanel9->Controls->Add(this->shufflrButton, 0, 0);
+			this->tableLayoutPanel9->Controls->Add(this->textBox1, 1, 0);
+			this->tableLayoutPanel9->Dock = System::Windows::Forms::DockStyle::Fill;
+			this->tableLayoutPanel9->Location = System::Drawing::Point(0, 81);
+			this->tableLayoutPanel9->Margin = System::Windows::Forms::Padding(0);
+			this->tableLayoutPanel9->Name = L"tableLayoutPanel9";
+			this->tableLayoutPanel9->RowCount = 1;
+			this->tableLayoutPanel9->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 100)));
+			this->tableLayoutPanel9->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Absolute, 20)));
+			this->tableLayoutPanel9->Size = System::Drawing::Size(151, 27);
+			this->tableLayoutPanel9->TabIndex = 0;
+			// 
+			// textBox1
+			// 
+			this->textBox1->Dock = System::Windows::Forms::DockStyle::Fill;
+			this->textBox1->Location = System::Drawing::Point(116, 3);
+			this->textBox1->Name = L"textBox1";
+			this->textBox1->Size = System::Drawing::Size(32, 22);
+			this->textBox1->TabIndex = 2;
+			this->textBox1->Text = L"100";
+			// 
 			// RubiksCubeSimulator
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 12);
@@ -857,6 +890,8 @@ namespace RubiksCubeSolver {
 			this->tableLayoutPanel7->ResumeLayout(false);
 			this->tableLayoutPanel7->PerformLayout();
 			this->tableLayoutPanel8->ResumeLayout(false);
+			this->tableLayoutPanel9->ResumeLayout(false);
+			this->tableLayoutPanel9->PerformLayout();
 			this->ResumeLayout(false);
 
 		}
@@ -996,9 +1031,12 @@ private: System::Void resetButton_Click(System::Object^  sender, System::EventAr
 	this->draw();
 }
 private: System::Void shufflrButton_Click(System::Object^  sender, System::EventArgs^  e) {
-	cube->Shuffle(200);
-	this->initTexture();
-	this->draw();
+	try {
+		cube->Shuffle(int::Parse(textBox1->Text));
+		this->initTexture();
+		this->draw();
+	}
+	catch (System::FormatException^ e) {}
 }
 delegate void BoolArgReturningVoidDelegate(bool enable);
 delegate void VoidDelegate();
