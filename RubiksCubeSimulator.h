@@ -1054,7 +1054,8 @@ void UpdateHTM() {
 	if (this->labelHtm->InvokeRequired) {
 		this->Invoke(gcnew VoidDelegate(this, &RubiksCubeSimulator::UpdateHTM));
 	} else {
-		this->labelHtm->Text = "HTM: " + cube->htm;
+		//this->labelHtm->Text = "HTM: " + cube->htm;
+		this->labelHtm->Text = "HTM: " + cube->turnNumber;
 	}
 }
 void UpdateQTM() {
@@ -1062,7 +1063,8 @@ void UpdateQTM() {
 		this->Invoke(gcnew VoidDelegate(this, &RubiksCubeSimulator::UpdateQTM));
 	}
 	else {
-		this->labelQtm->Text = "QTM: " + cube->qtm;
+		//this->labelQtm->Text = "QTM: " + cube->qtm;
+		this->labelQtm->Text = "";
 	}
 }
 private: System::Void SolveCube() {

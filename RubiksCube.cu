@@ -3,15 +3,30 @@
 #include <iostream>
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
+#include <GL/glew.h>
+#include <cuda_gl_interop.h>
 
+#define THREAD_NUM 1024
+#define CHECK {\
+	auto e = cudaDeviceSynchronize();\
+	if (e != cudaSuccess) {\
+		printf("At " __FILE__ ":%d, %s\n", __LINE__, cudaGetErrorString(e));\
+	}\
+}
 __device__ __host__ int CeilDiv(int a, int b) { return (a - 1) / b + 1; }
 __device__ __host__ int CeilAlign(int a, int b) { return CeilDiv(a, b) * b; }
+void CHECK_CUDA(cudaError_t err) {
+	if (err != cudaSuccess) {
+		std::cerr << "Error: " << cudaGetErrorString(err) << std::endl;
+	}
+}
 
 RubiksCube::RubiksCube(int size) {
 	this->size = size;
 	this->data = new unsigned char[size * size * 6];
 	useHost = size < 100;
 	cudaDataIndex = 0;
+	cudaImageArray = NULL;
 	for (int i = 0; i < CUDA_DATA_LEN; i++) {
 		cudaMalloc(cudaData + i, sizeof(unsigned char) * size * size * 6);
 	}
@@ -254,6 +269,13 @@ __global__ void CudaReset(unsigned char* data, int size) {
 	}
 }
 
+void RubiksCube::MapTexture(unsigned char textureID) {
+	cudaGraphicsResource *cudaImageResource;
+	CHECK_CUDA(cudaGraphicsGLRegisterImage(&cudaImageResource, textureID, GL_TEXTURE_CUBE_MAP, cudaGraphicsRegisterFlagsSurfaceLoadStore));
+	CHECK_CUDA(cudaGraphicsMapResources(1, &cudaImageResource, 0));
+	CHECK_CUDA(cudaGraphicsSubResourceGetMappedArray(&cudaImageArray, cudaImageResource, 0, 0));
+}
+
 void RubiksCube::Reset() {
 	this->htm = 0;
 	this->qtm = 0;
@@ -266,7 +288,7 @@ void RubiksCube::Reset() {
 		memset(this->data + size * size * 4, 4, sizeof(unsigned char) * size * size);
 		memset(this->data + size * size * 5, 5, sizeof(unsigned char) * size * size);
 	} else {
-		CudaReset << <dim3(CeilDiv(size * size * 6, 32)), dim3(32) >> >(cudaData[0], size);
+		CudaReset << <dim3(CeilDiv(size * size * 6, THREAD_NUM)), dim3(THREAD_NUM) >> >(cudaData[0], size);
 		//for (int i = 1; i < CUDA_DATA_LEN; i++) {
 		//	cudaMemcpy(cudaData[i], cudaData[0], sizeof(unsigned char) * size * size * 6, cudaMemcpyDeviceToDevice);
 		//}
@@ -884,7 +906,7 @@ void RubiksCube::Rotate(int type, int column, int angle, bool unredo) {
 		unsigned char* src = GetCudaData();
 		SwitchCudaData();
 		unsigned char* dst = GetCudaData();
-		CudaRotate << <dim3(CeilDiv(size * size * 6, 32)), dim3(32) >> >(dst, src, size, type, column, angle);
+		CudaRotate << <dim3(CeilDiv(size * size * 6, THREAD_NUM)), dim3(THREAD_NUM) >> >(dst, src, size, type, column, angle);
 	}
 	if (!unredo) {
 		
@@ -918,6 +940,9 @@ unsigned char* RubiksCube::SynchronizeData() const {
 		cudaMemcpy(GetCudaData(), this->data, sizeof(unsigned char) * size * size * 6, cudaMemcpyHostToDevice);
 	} else {
 		cudaMemcpy(this->data, GetCudaData(), sizeof(unsigned char) * size * size * 6, cudaMemcpyDeviceToHost);
+	}
+	if (cudaImageArray) {
+		cudaMemcpyToArray(cudaImageArray, 0, 0, GetCudaData(), sizeof(unsigned char) * size * size * 6, cudaMemcpyDeviceToDevice);
 	}
 	return data;
 }

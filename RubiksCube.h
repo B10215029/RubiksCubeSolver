@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>    // std::random_shuffle
 #include <time.h>
+#include <cuda_runtime.h>
 #define CUDA_DATA_LEN 2
 struct turn
 {
@@ -32,8 +33,10 @@ public:
 	unsigned char* cudaData[CUDA_DATA_LEN];
 	bool useHost;
 	int cudaDataIndex;
+	cudaArray *cudaImageArray;
 	RubiksCube(int size);
 	~RubiksCube();
+	void MapTexture(unsigned char textureID);
 	void Reset();
 	void Shuffle(int time);
 	void Solve();
