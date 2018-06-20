@@ -20,6 +20,8 @@ namespace RubiksCubeSolver {
 		RubiksCubeSimulator(void)
 		{
 			InitializeComponent();
+			this->undoTimer = (gcnew System::Windows::Forms::Timer());
+			this->redoTimer = (gcnew System::Windows::Forms::Timer());
 			this->panel1->MouseWheel += (gcnew System::Windows::Forms::MouseEventHandler(this, &RubiksCubeSimulator::panel1_MouseWheel));
 			mouseDown = false;
 			zoom = 0;
@@ -78,7 +80,6 @@ namespace RubiksCubeSolver {
 	private: System::Windows::Forms::TableLayoutPanel^  tableLayoutPanel1;
 	private: System::Windows::Forms::TableLayoutPanel^  tableLayoutPanel2;
 	private: System::Windows::Forms::Button^  rotateButton;
-
 	private: System::Windows::Forms::TableLayoutPanel^  tableLayoutPanel3;
 	private: System::Windows::Forms::Label^  label1;
 	private: System::Windows::Forms::Label^  label2;
@@ -100,12 +101,6 @@ namespace RubiksCubeSolver {
 	private: System::Windows::Forms::TextBox^  textBoxB;
 	private: System::Windows::Forms::TextBox^  textBoxL;
 	private: System::Windows::Forms::TextBox^  textBoxD;
-
-
-
-
-
-
 	private: System::Windows::Forms::Button^  rotateFButton;
 	private: System::Windows::Forms::Button^  reverseFButton;
 	private: System::Windows::Forms::Button^  rotateRButton;
@@ -122,16 +117,17 @@ namespace RubiksCubeSolver {
 	private: System::Windows::Forms::TableLayoutPanel^  tableLayoutPanel7;
 	private: System::Windows::Forms::Label^  label10;
 	private: System::Windows::Forms::TextBox^  sizeTextBox;
-
 	private: System::Windows::Forms::Button^  resetButton;
 	private: System::Windows::Forms::Button^  shufflrButton;
 	private: System::Windows::Forms::Button^  solveButton;
-
-
-
 	private: System::Windows::Forms::Label^  labelHtm;
 	private: System::Windows::Forms::Label^  labelQtm;
-
+	private: System::Windows::Forms::CheckBox^  checkBox1;
+	private: System::Windows::Forms::TableLayoutPanel^  tableLayoutPanel8;
+	private: System::Windows::Forms::Button^  undoButton;
+	private: System::Windows::Forms::Button^  redoButton;
+	private: System::Windows::Forms::Timer^  redoTimer;
+	private: System::Windows::Forms::Timer^  undoTimer;
 
 
 
@@ -185,11 +181,15 @@ namespace RubiksCubeSolver {
 			this->tableLayoutPanel7 = (gcnew System::Windows::Forms::TableLayoutPanel());
 			this->label10 = (gcnew System::Windows::Forms::Label());
 			this->sizeTextBox = (gcnew System::Windows::Forms::TextBox());
+			this->checkBox1 = (gcnew System::Windows::Forms::CheckBox());
 			this->resetButton = (gcnew System::Windows::Forms::Button());
 			this->shufflrButton = (gcnew System::Windows::Forms::Button());
 			this->solveButton = (gcnew System::Windows::Forms::Button());
 			this->labelHtm = (gcnew System::Windows::Forms::Label());
 			this->labelQtm = (gcnew System::Windows::Forms::Label());
+			this->tableLayoutPanel8 = (gcnew System::Windows::Forms::TableLayoutPanel());
+			this->undoButton = (gcnew System::Windows::Forms::Button());
+			this->redoButton = (gcnew System::Windows::Forms::Button());
 			this->tableLayoutPanel1->SuspendLayout();
 			this->tableLayoutPanel4->SuspendLayout();
 			this->tableLayoutPanel2->SuspendLayout();
@@ -197,6 +197,7 @@ namespace RubiksCubeSolver {
 			this->tableLayoutPanel5->SuspendLayout();
 			this->tableLayoutPanel6->SuspendLayout();
 			this->tableLayoutPanel7->SuspendLayout();
+			this->tableLayoutPanel8->SuspendLayout();
 			this->SuspendLayout();
 			// 
 			// panel1
@@ -664,51 +665,54 @@ namespace RubiksCubeSolver {
 			this->tableLayoutPanel6->ColumnCount = 1;
 			this->tableLayoutPanel6->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Percent,
 				100)));
-			this->tableLayoutPanel6->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Absolute,
-				20)));
 			this->tableLayoutPanel6->Controls->Add(this->tableLayoutPanel7, 0, 0);
 			this->tableLayoutPanel6->Controls->Add(this->resetButton, 0, 1);
 			this->tableLayoutPanel6->Controls->Add(this->shufflrButton, 0, 2);
 			this->tableLayoutPanel6->Controls->Add(this->solveButton, 0, 3);
-			this->tableLayoutPanel6->Controls->Add(this->labelHtm, 0, 4);
-			this->tableLayoutPanel6->Controls->Add(this->labelQtm, 0, 5);
+			this->tableLayoutPanel6->Controls->Add(this->labelHtm, 0, 5);
+			this->tableLayoutPanel6->Controls->Add(this->labelQtm, 0, 6);
+			this->tableLayoutPanel6->Controls->Add(this->tableLayoutPanel8, 0, 4);
 			this->tableLayoutPanel6->Dock = System::Windows::Forms::DockStyle::Fill;
 			this->tableLayoutPanel6->Location = System::Drawing::Point(624, 3);
 			this->tableLayoutPanel6->Name = L"tableLayoutPanel6";
-			this->tableLayoutPanel6->RowCount = 6;
-			this->tableLayoutPanel6->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 16.66667F)));
-			this->tableLayoutPanel6->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 16.66667F)));
-			this->tableLayoutPanel6->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 16.66667F)));
-			this->tableLayoutPanel6->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 16.66667F)));
-			this->tableLayoutPanel6->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 16.66667F)));
-			this->tableLayoutPanel6->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 16.66667F)));
+			this->tableLayoutPanel6->RowCount = 7;
+			this->tableLayoutPanel6->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 19.9992F)));
+			this->tableLayoutPanel6->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 19.9992F)));
+			this->tableLayoutPanel6->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 19.9992F)));
+			this->tableLayoutPanel6->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 19.9992F)));
+			this->tableLayoutPanel6->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 20.00319F)));
+			this->tableLayoutPanel6->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Absolute, 20)));
+			this->tableLayoutPanel6->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Absolute, 20)));
 			this->tableLayoutPanel6->Size = System::Drawing::Size(151, 179);
 			this->tableLayoutPanel6->TabIndex = 3;
 			// 
 			// tableLayoutPanel7
 			// 
-			this->tableLayoutPanel7->ColumnCount = 2;
+			this->tableLayoutPanel7->ColumnCount = 3;
+			this->tableLayoutPanel7->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Absolute,
+				20)));
 			this->tableLayoutPanel7->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Percent,
 				50)));
 			this->tableLayoutPanel7->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Percent,
 				50)));
-			this->tableLayoutPanel7->Controls->Add(this->label10, 0, 0);
-			this->tableLayoutPanel7->Controls->Add(this->sizeTextBox, 1, 0);
+			this->tableLayoutPanel7->Controls->Add(this->label10, 1, 0);
+			this->tableLayoutPanel7->Controls->Add(this->sizeTextBox, 2, 0);
+			this->tableLayoutPanel7->Controls->Add(this->checkBox1, 0, 0);
+			this->tableLayoutPanel7->Dock = System::Windows::Forms::DockStyle::Fill;
 			this->tableLayoutPanel7->Location = System::Drawing::Point(3, 3);
 			this->tableLayoutPanel7->Name = L"tableLayoutPanel7";
 			this->tableLayoutPanel7->RowCount = 1;
 			this->tableLayoutPanel7->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 100)));
-			this->tableLayoutPanel7->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Absolute, 23)));
-			this->tableLayoutPanel7->Size = System::Drawing::Size(145, 23);
+			this->tableLayoutPanel7->Size = System::Drawing::Size(145, 21);
 			this->tableLayoutPanel7->TabIndex = 0;
 			// 
 			// label10
 			// 
 			this->label10->AutoSize = true;
 			this->label10->Dock = System::Windows::Forms::DockStyle::Fill;
-			this->label10->Location = System::Drawing::Point(3, 0);
+			this->label10->Location = System::Drawing::Point(23, 0);
 			this->label10->Name = L"label10";
-			this->label10->Size = System::Drawing::Size(66, 23);
+			this->label10->Size = System::Drawing::Size(56, 21);
 			this->label10->TabIndex = 0;
 			this->label10->Text = L"size";
 			this->label10->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
@@ -716,18 +720,30 @@ namespace RubiksCubeSolver {
 			// sizeTextBox
 			// 
 			this->sizeTextBox->Dock = System::Windows::Forms::DockStyle::Fill;
-			this->sizeTextBox->Location = System::Drawing::Point(75, 3);
+			this->sizeTextBox->Location = System::Drawing::Point(85, 3);
 			this->sizeTextBox->Name = L"sizeTextBox";
-			this->sizeTextBox->Size = System::Drawing::Size(67, 22);
+			this->sizeTextBox->Size = System::Drawing::Size(57, 22);
 			this->sizeTextBox->TabIndex = 1;
 			this->sizeTextBox->Text = L"3";
+			// 
+			// checkBox1
+			// 
+			this->checkBox1->AutoSize = true;
+			this->checkBox1->Checked = true;
+			this->checkBox1->CheckState = System::Windows::Forms::CheckState::Checked;
+			this->checkBox1->Location = System::Drawing::Point(3, 3);
+			this->checkBox1->Name = L"checkBox1";
+			this->checkBox1->Size = System::Drawing::Size(14, 14);
+			this->checkBox1->TabIndex = 2;
+			this->checkBox1->UseVisualStyleBackColor = true;
+			this->checkBox1->CheckedChanged += gcnew System::EventHandler(this, &RubiksCubeSimulator::checkBox1_CheckedChanged);
 			// 
 			// resetButton
 			// 
 			this->resetButton->Dock = System::Windows::Forms::DockStyle::Fill;
-			this->resetButton->Location = System::Drawing::Point(3, 32);
+			this->resetButton->Location = System::Drawing::Point(3, 30);
 			this->resetButton->Name = L"resetButton";
-			this->resetButton->Size = System::Drawing::Size(145, 23);
+			this->resetButton->Size = System::Drawing::Size(145, 21);
 			this->resetButton->TabIndex = 1;
 			this->resetButton->Text = L"Reset";
 			this->resetButton->UseVisualStyleBackColor = true;
@@ -736,9 +752,9 @@ namespace RubiksCubeSolver {
 			// shufflrButton
 			// 
 			this->shufflrButton->Dock = System::Windows::Forms::DockStyle::Fill;
-			this->shufflrButton->Location = System::Drawing::Point(3, 61);
+			this->shufflrButton->Location = System::Drawing::Point(3, 57);
 			this->shufflrButton->Name = L"shufflrButton";
-			this->shufflrButton->Size = System::Drawing::Size(145, 23);
+			this->shufflrButton->Size = System::Drawing::Size(145, 21);
 			this->shufflrButton->TabIndex = 1;
 			this->shufflrButton->Text = L"Shuffle";
 			this->shufflrButton->UseVisualStyleBackColor = true;
@@ -747,9 +763,9 @@ namespace RubiksCubeSolver {
 			// solveButton
 			// 
 			this->solveButton->Dock = System::Windows::Forms::DockStyle::Fill;
-			this->solveButton->Location = System::Drawing::Point(3, 90);
+			this->solveButton->Location = System::Drawing::Point(3, 84);
 			this->solveButton->Name = L"solveButton";
-			this->solveButton->Size = System::Drawing::Size(145, 23);
+			this->solveButton->Size = System::Drawing::Size(145, 21);
 			this->solveButton->TabIndex = 1;
 			this->solveButton->Text = L"Solve";
 			this->solveButton->UseVisualStyleBackColor = true;
@@ -759,9 +775,9 @@ namespace RubiksCubeSolver {
 			// 
 			this->labelHtm->AutoSize = true;
 			this->labelHtm->Dock = System::Windows::Forms::DockStyle::Fill;
-			this->labelHtm->Location = System::Drawing::Point(3, 116);
+			this->labelHtm->Location = System::Drawing::Point(3, 135);
 			this->labelHtm->Name = L"labelHtm";
-			this->labelHtm->Size = System::Drawing::Size(145, 29);
+			this->labelHtm->Size = System::Drawing::Size(145, 20);
 			this->labelHtm->TabIndex = 2;
 			this->labelHtm->Text = L"HTM: 0";
 			this->labelHtm->TextAlign = System::Drawing::ContentAlignment::MiddleLeft;
@@ -770,12 +786,55 @@ namespace RubiksCubeSolver {
 			// 
 			this->labelQtm->AutoSize = true;
 			this->labelQtm->Dock = System::Windows::Forms::DockStyle::Fill;
-			this->labelQtm->Location = System::Drawing::Point(3, 145);
+			this->labelQtm->Location = System::Drawing::Point(3, 155);
 			this->labelQtm->Name = L"labelQtm";
-			this->labelQtm->Size = System::Drawing::Size(145, 34);
+			this->labelQtm->Size = System::Drawing::Size(145, 24);
 			this->labelQtm->TabIndex = 3;
 			this->labelQtm->Text = L"QTM: 0";
 			this->labelQtm->TextAlign = System::Drawing::ContentAlignment::MiddleLeft;
+			// 
+			// tableLayoutPanel8
+			// 
+			this->tableLayoutPanel8->ColumnCount = 2;
+			this->tableLayoutPanel8->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Percent,
+				50)));
+			this->tableLayoutPanel8->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Percent,
+				50)));
+			this->tableLayoutPanel8->Controls->Add(this->undoButton, 0, 0);
+			this->tableLayoutPanel8->Controls->Add(this->redoButton, 1, 0);
+			this->tableLayoutPanel8->Dock = System::Windows::Forms::DockStyle::Fill;
+			this->tableLayoutPanel8->Location = System::Drawing::Point(0, 108);
+			this->tableLayoutPanel8->Margin = System::Windows::Forms::Padding(0);
+			this->tableLayoutPanel8->Name = L"tableLayoutPanel8";
+			this->tableLayoutPanel8->RowCount = 1;
+			this->tableLayoutPanel8->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 100)));
+			this->tableLayoutPanel8->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Absolute, 20)));
+			this->tableLayoutPanel8->Size = System::Drawing::Size(151, 27);
+			this->tableLayoutPanel8->TabIndex = 4;
+			// 
+			// undoButton
+			// 
+			this->undoButton->Dock = System::Windows::Forms::DockStyle::Fill;
+			this->undoButton->Location = System::Drawing::Point(3, 3);
+			this->undoButton->Name = L"undoButton";
+			this->undoButton->Size = System::Drawing::Size(69, 21);
+			this->undoButton->TabIndex = 0;
+			this->undoButton->Text = L"Undo";
+			this->undoButton->UseVisualStyleBackColor = true;
+			this->undoButton->MouseDown += gcnew System::Windows::Forms::MouseEventHandler(this, &RubiksCubeSimulator::undoButton_MouseDown);
+			this->undoButton->MouseUp += gcnew System::Windows::Forms::MouseEventHandler(this, &RubiksCubeSimulator::undoButton_MouseUp);
+			// 
+			// redoButton
+			// 
+			this->redoButton->Dock = System::Windows::Forms::DockStyle::Fill;
+			this->redoButton->Location = System::Drawing::Point(78, 3);
+			this->redoButton->Name = L"redoButton";
+			this->redoButton->Size = System::Drawing::Size(70, 21);
+			this->redoButton->TabIndex = 1;
+			this->redoButton->Text = L"Redo";
+			this->redoButton->UseVisualStyleBackColor = true;
+			this->redoButton->MouseDown += gcnew System::Windows::Forms::MouseEventHandler(this, &RubiksCubeSimulator::redoButton_MouseDown);
+			this->redoButton->MouseUp += gcnew System::Windows::Forms::MouseEventHandler(this, &RubiksCubeSimulator::redoButton_MouseUp);
 			// 
 			// RubiksCubeSimulator
 			// 
@@ -797,6 +856,7 @@ namespace RubiksCubeSolver {
 			this->tableLayoutPanel6->PerformLayout();
 			this->tableLayoutPanel7->ResumeLayout(false);
 			this->tableLayoutPanel7->PerformLayout();
+			this->tableLayoutPanel8->ResumeLayout(false);
 			this->ResumeLayout(false);
 
 		}
@@ -968,6 +1028,41 @@ private: System::Void panel1_MouseWheel(System::Object^  sender, System::Windows
 		zoom -= 0.1;
 	}
 	mouseMove(0, 0);
+}
+private: System::Void checkBox1_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
+	this->draw();
+}
+private: System::Void redoButton_MouseDown(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+	cube->Redo();
+	this->initTexture();
+	this->draw();
+	this->redoTimer->Interval = 1000;
+	this->redoTimer->Enabled = true;
+}
+private: System::Void redoButton_MouseUp(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+	this->redoTimer->Enabled = false;
+}
+private: System::Void redoTimer_Tick(System::Object^  sender, System::EventArgs^  e) {
+	cube->Redo();
+	this->initTexture();
+	this->draw();
+	this->redoTimer->Interval = 100;
+}
+private: System::Void undoButton_MouseDown(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+	cube->Undo();
+	this->initTexture();
+	this->draw();
+	this->undoTimer->Interval = 1000;
+	this->undoTimer->Enabled = true;
+}
+private: System::Void undoButton_MouseUp(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+	this->undoTimer->Enabled = false;
+}
+private: System::Void undoTimer_Tick(System::Object^  sender, System::EventArgs^  e) {
+	cube->Undo();
+	this->initTexture();
+	this->draw();
+	this->undoTimer->Interval = 100;
 }
 };
 }
