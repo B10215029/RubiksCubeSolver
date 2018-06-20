@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>    // std::random_shuffle
 #include <time.h>
+#define CUDA_DATA_LEN 2
 class RubiksCube {
 public:
 	//   U
@@ -16,6 +17,8 @@ public:
 	// 4 0 1 3
 	//   5
 	unsigned char* data;
+	unsigned char* cudaData[CUDA_DATA_LEN];
+	int cudaDataIndex;
 	RubiksCube(int size);
 	~RubiksCube();
 	void Reset();
@@ -37,11 +40,14 @@ public:
 	void Rotate(int type, int column = 1, int angle = 1);
 	void Redo();
 	void Undo();
+	unsigned char* SynchronizeData() const;
+	inline unsigned char* GetCudaData() const { return cudaData[cudaDataIndex]; };
+	inline int SwitchCudaData() { return cudaDataIndex = (cudaDataIndex + 1) % CUDA_DATA_LEN; };
 	friend std::ostream& operator<<(std::ostream& outputStream, const RubiksCube& cube);
 	bool isSolved();
 	bool isSolvedPart(int step);
 	bool checkMe();
-	bool SolveTree(int turn, int maxTurn,int lastFace,int step);
+	bool SolveTree(int turn, int maxTurn, int lastFace, int step);
 	void ConditionPush(std::vector<int> &v, int index, int color);
 	bool SolveMiddle(int turn, int maxTurn, int lastFace, int step);
 	bool SolveBCross(int turn, int maxTurn, int lastFace, int step);

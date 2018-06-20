@@ -252,6 +252,7 @@ void RubiksCubeSolver::RubiksCubeSimulator::initProgram() {
 }
 
 void RubiksCubeSolver::RubiksCubeSimulator::initTexture() {
+	cube->SynchronizeData();
 	wglMakeCurrent(hDC, hGLRC);
 	GLuint cubeTextureID = this->cubeTextureID;
 	if (cubeTextureID == UINT_MAX) {
