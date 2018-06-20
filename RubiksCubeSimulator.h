@@ -22,6 +22,8 @@ namespace RubiksCubeSolver {
 			InitializeComponent();
 			this->undoTimer = (gcnew System::Windows::Forms::Timer());
 			this->redoTimer = (gcnew System::Windows::Forms::Timer());
+			this->undoTimer->Tick += (gcnew System::EventHandler(this, &RubiksCubeSimulator::undoTimer_Tick));
+			this->redoTimer->Tick += (gcnew System::EventHandler(this, &RubiksCubeSimulator::redoTimer_Tick));
 			this->panel1->MouseWheel += (gcnew System::Windows::Forms::MouseEventHandler(this, &RubiksCubeSimulator::panel1_MouseWheel));
 			mouseDown = false;
 			zoom = 0;
