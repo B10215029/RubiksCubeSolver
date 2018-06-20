@@ -1,3 +1,4 @@
+![page](https://i.imgur.com/jay7pf4.png)
 # Rubik’s Cube Solver
 
 GPGPU Final Project Team 2
@@ -20,3 +21,16 @@ M10615005 & M10615004
 - [x] 3D視角的GUI介面
 - [ ] 可以用動畫展示解答
 - [ ] 實作其他方法用來比較
+
+![page](https://i.imgur.com/mLKLnlV.png)\
+![page](https://i.imgur.com/uebwbuV.png)\
+![page](https://i.imgur.com/AKvPoMq.png)\
+![page](https://i.imgur.com/p6Y5dFR.png)\
+![page](https://i.imgur.com/VZPw1jF.png)\
+![page](https://i.imgur.com/6OBHsSU.png)\
+![page](https://i.imgur.com/rrq1JgH.png)\
+![page](https://i.imgur.com/UGdu4w4.png)\
+![page](https://i.imgur.com/wfc6LW1.png)\
+![page](https://i.imgur.com/2FWG2iL.png)\
+![page](https://i.imgur.com/NgbgMmk.png)\
+![page](https://i.imgur.com/QDLlI6f.png)
