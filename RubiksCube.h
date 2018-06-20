@@ -41,7 +41,9 @@ public:
 	bool isSolved();
 	bool isSolvedPart(int step);
 	bool checkMe();
+	bool directSearch2x2Tree(int turn, int maxTurn, int lastFace, std::vector<int> types,int phase);
 	bool SolveTree(int turn, int maxTurn,int lastFace,int step);
+	int rank2x2();
 	void ConditionPush(std::vector<int> &v, int index, int color);
 	bool SolveMiddle(int turn, int maxTurn, int lastFace, int step);
 	bool SolveBCross(int turn, int maxTurn, int lastFace, int step);

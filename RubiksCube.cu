@@ -249,7 +249,8 @@ void RubiksCube::Shuffle(int time) {
 	for (size_t i = 0; i < time; i++)
 	{
 		int type = rand() % 6;
-		int column = (rand() % (int)(size - 2))+1;
+		int column = (rand() % (int)(size /2))+1;
+
 		int angle = (rand() % 3) + 1;
 		Rotate(type, column, angle);
 	}
@@ -258,6 +259,31 @@ void RubiksCube::Shuffle(int time) {
 void RubiksCube::Solve() {
 	int step = 0;
 	t = clock();
+	if (size == 2) {
+		std::vector<int> types{ 0,1,2 };
+		for (size_t i = 0; i < 500; i++)
+		{
+			t = clock();
+			Shuffle(200);
+			int phase = 1;
+			//solve to lasted 2 step
+			if (!directSearch2x2Tree(1, 9, -1, types, phase)) {
+				std::cout << "faild phase 1 QQ" << std::endl;
+				break;
+			}
+			else {
+				phase++;
+				if(!directSearch2x2Tree(1, 3, -1, types, phase)) {
+					std::cout << "faild phase 2 QQ" << std::endl;
+					break;
+				}
+			}
+			//solve final 2 step;
+			clock_t pass = clock() - t;
+			std::cout << "pass time: " << (float)pass / CLOCKS_PER_SEC << " second." << std::endl;
+		}
+		return;
+	}
 	//condition.size()/2
 	//for (size_t i = 0; i < condition.size() / 2; i++)
 	//{
@@ -326,6 +352,9 @@ void RubiksCube::Solve() {
 	}
 	else {
 		std::cout << "solve BCrossSwap pass" << std::endl;
+	}
+	if (isSolved()) {
+		std::cout << "solved!!" << std::endl;
 	}
 }
 bool RubiksCube::SolveMiddle(int turn,int maxTurn,int lastFace,int step) {
@@ -627,6 +656,26 @@ bool RubiksCube::SolveTree(int turn, int maxTurn,int lastFace,int step)
 	return false;
 }
 
+int RubiksCube::rank2x2()
+{
+	if (size != 2)return 0;
+	int rank = 0;
+	int a = 0, b = 0;
+	for (size_t i = 0; i < 6; i++)
+	{
+		//
+		a = 0; b = 0;
+		a += data[size*size*i + 0] == data[size*size*i + 1] ? 1 : 0;
+		a += data[size*size*i + 2] == data[size*size*i + 3] ? 1 : 0;
+		b += data[size*size*i + 0] == data[size*size*i + 2] ? 1 : 0;
+		b += data[size*size*i + 1] == data[size*size*i + 3] ? 1 : 0;
+		if (a == b&&a == 2)
+			rank += 100;
+		rank += a > b ? a : b;
+	}
+	return rank;
+}
+
 void RubiksCube::ConditionPush(std::vector<int> &v, int index, int color)
 {
 	v.push_back(index);
@@ -719,16 +768,21 @@ void RubiksCube::Undo() {
 
 bool RubiksCube::isSolved()
 {
+	int tables[6];
+	for (size_t i = 0; i < 6; i++)
+	{
+		tables[i] = data[size*size * i];
+	}
 	for (size_t i = 0; i < size; i++)
 	{
 		for (size_t j = 0; j < size; j++)
 		{
-			if (data[size*size * 0 + size*i + j] != 0)return false;
-			if (data[size*size * 1 + size*i + j] != 1)return false;
-			if (data[size*size * 2 + size*i + j] != 2)return false;
-			if (data[size*size * 3 + size*i + j] != 3)return false;
-			if (data[size*size * 4 + size*i + j] != 4)return false;
-			if (data[size*size * 5 + size*i + j] != 5)return false;
+			if (data[size*size * 0 + size*i + j] != tables[0])return false;
+			if (data[size*size * 1 + size*i + j] != tables[1])return false;
+			if (data[size*size * 2 + size*i + j] != tables[2])return false;
+			if (data[size*size * 3 + size*i + j] != tables[3])return false;
+			if (data[size*size * 4 + size*i + j] != tables[4])return false;
+			if (data[size*size * 5 + size*i + j] != tables[5])return false;
 		}
 	}
 	return true;
@@ -785,6 +839,43 @@ bool RubiksCube::checkMe()
 		Rotate(t[index], c[index], 4 - a[index]);
 	}
 	std::cout << *this;
+	return false;
+}
+
+bool RubiksCube::directSearch2x2Tree(int turn, int maxTurn, int lastFace, std::vector<int> types,int phase)
+{
+	if (phase == 1) {
+		if (rank2x2() == 212)//in that condition we can solve in 4 step;
+			return true;
+	}else if(phase == 2)
+		if (isSolved())//in that condition we can solve in 4 step;
+			return true;
+	if (turn > maxTurn)
+		return false;
+	//clock_t pass = clock() - t;
+	//printf("It took me %d clicks (%f seconds).\n", t, ((float)t) / CLOCKS_PER_SEC);
+	//if ((float)pass / CLOCKS_PER_SEC > 120) {
+	//	return false;
+	//}
+	std::vector<int> angles{ 1,2,3 };
+	std::random_shuffle(types.begin(), types.end());
+	std::random_shuffle(angles.begin(), angles.end());
+	for (size_t type = 0; type < types.size(); type++)
+	{
+		if (lastFace == types[type])
+			continue;
+		for (size_t column = 1; column <= (int)(size / 2); column++)
+		{
+			for (size_t angle = 0; angle < angles.size(); angle++)
+			{
+				Rotate(types[type], column, angles[angle]);
+				if (directSearch2x2Tree(turn + 1, maxTurn, types[type], types,phase))
+					return true;
+				else
+					Rotate(types[type], column, 4 - angles[angle]);
+			}
+		}
+	}
 	return false;
 }
 
