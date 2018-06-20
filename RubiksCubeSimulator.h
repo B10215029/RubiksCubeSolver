@@ -1000,10 +1000,42 @@ private: System::Void shufflrButton_Click(System::Object^  sender, System::Event
 	this->initTexture();
 	this->draw();
 }
-private: System::Void solveButton_Click(System::Object^  sender, System::EventArgs^  e) {
+delegate void BoolArgReturningVoidDelegate(bool enable);
+delegate void VoidDelegate();
+void SetEnable(bool enable) {
+	if (this->tableLayoutPanel4->InvokeRequired) {
+		this->Invoke(gcnew BoolArgReturningVoidDelegate(this, &RubiksCubeSimulator::SetEnable), enable);
+	}
+	else {
+		this->tableLayoutPanel4->Enabled = enable;
+	}
+}
+void UpdateHTM() {
+	if (this->labelHtm->InvokeRequired) {
+		this->Invoke(gcnew VoidDelegate(this, &RubiksCubeSimulator::UpdateHTM));
+	} else {
+		this->labelHtm->Text = "HTM: " + cube->htm;
+	}
+}
+void UpdateQTM() {
+	if (this->labelQtm->InvokeRequired) {
+		this->Invoke(gcnew VoidDelegate(this, &RubiksCubeSimulator::UpdateQTM));
+	}
+	else {
+		this->labelQtm->Text = "QTM: " + cube->qtm;
+	}
+}
+private: System::Void SolveCube() {
+	SetEnable(false);
 	cube->Solve();
 	this->initTexture();
 	this->draw();
+	SetEnable(true);
+}
+private: System::Void solveButton_Click(System::Object^  sender, System::EventArgs^  e) {
+	//Solve();
+	System::Threading::Thread^ solveThread = gcnew System::Threading::Thread(gcnew System::Threading::ThreadStart(this, &RubiksCubeSimulator::SolveCube));
+	solveThread->Start();
 }
 private: System::Void panel1_MouseMove(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
 	if (mouseDown) {

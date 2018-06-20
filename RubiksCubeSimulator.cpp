@@ -291,8 +291,8 @@ void RubiksCubeSolver::RubiksCubeSimulator::draw()
 	glBindVertexArray(0);
 
 	wglMakeCurrent(NULL, NULL);
-	this->labelHtm->Text = "HTM: " + cube->htm;
-	this->labelQtm->Text = "QTM: " + cube->qtm;
+	this->UpdateHTM();
+	this->UpdateQTM();
 }
 
 void RubiksCubeSolver::RubiksCubeSimulator::resize() {
