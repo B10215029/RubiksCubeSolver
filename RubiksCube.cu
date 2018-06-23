@@ -271,9 +271,11 @@ __global__ void CudaReset(unsigned char* data, int size) {
 
 void RubiksCube::MapTexture(unsigned char textureID) {
 	cudaGraphicsResource *cudaImageResource;
-	CHECK_CUDA(cudaGraphicsGLRegisterImage(&cudaImageResource, textureID, GL_TEXTURE_CUBE_MAP, cudaGraphicsRegisterFlagsSurfaceLoadStore));
+	CHECK_CUDA(cudaGraphicsGLRegisterImage(&cudaImageResource, textureID, GL_TEXTURE_2D_ARRAY, cudaGraphicsRegisterFlagsSurfaceLoadStore));
 	CHECK_CUDA(cudaGraphicsMapResources(1, &cudaImageResource, 0));
 	CHECK_CUDA(cudaGraphicsSubResourceGetMappedArray(&cudaImageArray, cudaImageResource, 0, 0));
+	//CHECK_CUDA(cudaGraphicsUnmapResources(1, &cudaImageResource, 0));
+	//CHECK_CUDA(cudaGraphicsUnregisterResource(cudaImageResource));
 }
 
 void RubiksCube::Reset() {

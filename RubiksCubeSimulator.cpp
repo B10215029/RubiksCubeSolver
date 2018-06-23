@@ -167,47 +167,47 @@ void RubiksCubeSolver::RubiksCubeSimulator::initProgram() {
 		+0, -1, +0,
 	};
 	static const GLfloat uvBufferData[] = {
-		+1, -1, -1,
-		-1, -1, -1,
-		-1, -1, +1,
-		-1, -1, +1,
-		+1, -1, +1,
-		+1, -1, -1,
+		1, 1, 3,
+		0, 1, 3,
+		0, 0, 3,
+		0, 0, 3,
+		1, 0, 3,
+		1, 1, 3,
 
-		-1, -1, +1,
-		-1, -1, -1,
-		-1, +1, -1,
-		-1, +1, -1,
-		-1, +1, +1,
-		-1, -1, +1,
+		1, 1, 1,
+		0, 1, 1,
+		0, 0, 1,
+		0, 0, 1,
+		1, 0, 1,
+		1, 1, 1,
 
-		-1, +1, -1,
-		+1, +1, -1,
-		+1, +1, +1,
-		+1, +1, +1,
-		-1, +1, +1,
-		-1, +1, -1,
+		0, 0, 2,
+		1, 0, 2,
+		1, 1, 2,
+		1, 1, 2,
+		0, 1, 2,
+		0, 0, 2,
 
-		+1, -1, -1,
-		+1, -1, +1,
-		+1, +1, +1,
-		+1, +1, +1,
-		+1, +1, -1,
-		+1, -1, -1,
+		1, 1, 0,
+		0, 1, 0,
+		0, 0, 0,
+		0, 0, 0,
+		1, 0, 0,
+		1, 1, 0,
 
-		+1, -1, +1,
-		-1, -1, +1,
-		-1, +1, +1,
-		-1, +1, +1,
-		+1, +1, +1,
-		+1, -1, +1,
+		1, 1, 4,
+		0, 1, 4,
+		0, 0, 4,
+		0, 0, 4,
+		1, 0, 4,
+		1, 1, 4,
 
-		+1, -1, -1,
-		-1, -1, -1,
-		-1, +1, -1,
-		-1, +1, -1,
-		+1, +1, -1,
-		+1, -1, -1,
+		0, 1, 5,
+		1, 1, 5,
+		1, 0, 5,
+		1, 0, 5,
+		0, 0, 5,
+		0, 1, 5,
 	};
 
 	modelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f));
@@ -259,18 +259,16 @@ void RubiksCubeSolver::RubiksCubeSimulator::initTexture() {
 		glGenTextures(1, &cubeTextureID);
 		this->cubeTextureID = cubeTextureID;
 	}
-	glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTextureID);
-	int width, height, nrChannels;
-	for (GLuint i = 0; i < 6; i++) {
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_R8, cube->size, cube->size, 0, GL_RED, GL_UNSIGNED_BYTE, cube->data + cube->size * cube->size * i);
-	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, cubeTextureID);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R8, cube->size, cube->size, 6, 0, GL_RED, GL_UNSIGNED_BYTE, cube->data);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 	//cube->MapTexture(cubeTextureID);
+	//cube->SynchronizeData();
 	wglMakeCurrent(NULL, NULL);
 }
 
@@ -285,7 +283,7 @@ void RubiksCubeSolver::RubiksCubeSimulator::draw()
 	glUniformMatrix4fv(projectionMatrixLocationID, 1, GL_FALSE, projectionMatrixPtr);
 	glUniformMatrix4fv(matrixLocationID, 1, GL_FALSE, modelMatrixPtr);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTextureID);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, cubeTextureID);
 	glUniform1i(textureLocationID, 0);
 	glUniform1i(sizeLocationID, this->checkBox1->Checked ? cube->size : 0);
 	glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
